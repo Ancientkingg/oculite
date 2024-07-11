@@ -1,3 +1,5 @@
 node_modules
 
 components.d.ts
+
+eslint_report.json
