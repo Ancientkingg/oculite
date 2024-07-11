@@ -7,3 +7,4 @@ A user-friendly dashboard for monitoring prices and values.
 - [Rust](https://www.rust-lang.org/)
 - [Rocket](https://rocket.rs/)
 - [Vue.js](https://vuejs.org/)
+- [PrimeVue](https://primevue.org/)
