@@ -1,0 +1,47 @@
+name: Frontend CI/CD
+
+on:
+    push:
+        branches: ['master']
+    pull_request:
+        branches: ['master']
+
+    workflow_dispatch:
+
+jobs:
+    lint:
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v4
+            - uses: actions/setup-node@v4
+              with:
+                  cache: 'npm'
+                  cache-dependency-path: client/package-lock.json
+
+            - name: Generate Code Linting Report
+              working-directory: client
+              run: |
+                  npm ci
+                  npm run lint:report
+            - name: Annotate Code Linting Results
+              uses: ataylorme/eslint-annotate-action@v3
+              with:
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                report-json: './client/eslint_report.json'
+
+    build:
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v4
+            - uses: actions/setup-node@v4
+              with:
+                  cache: 'npm'
+                  cache-dependency-path: client/package-lock.json
+
+            - name: Build Frontend
+              working-directory: client
+              run: |
+                  npm ci
+                  npm run build

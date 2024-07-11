@@ -2,25 +2,36 @@ const OFF = 0, WARN = 1, ERROR = 2;
 
 module.exports =
 {
-    parser: '@typescript-eslint/parser',
     parserOptions: {
+        parser: '@typescript-eslint/parser',
         project: './tsconfig.app.json',
         tsconfigRootDir: __dirname,
         sourceType: 'module',
+        extraFileExtensions: ['.vue'],
     },
-    plugins: ['@typescript-eslint/eslint-plugin', 'prettier'],
+    plugins: ['@typescript-eslint/eslint-plugin', 'prettier', 'vue', 'disable'],
+    processor: 'disable/disable',
     extends: [
         'plugin:@typescript-eslint/recommended',
         'plugin:prettier/recommended',
+        'plugin:vue/vue3-recommended'
     ],
     root: true,
+
+    overrides: [{
+        files: ['src/**/*.vue'],
+        settings: {
+            'disable/plugins': ['prettier']
+        }
+    }],
 
     env: {
         node: true,
         jest: true,
     },
-    ignorePatterns: ['vite.config.ts', 'tailwind.config.js', 'postcss.config.js'],
+    ignorePatterns: ['vite.config.ts', 'tailwind.config.js', 'postcss.config.js', '.eslintrc.cjs'],
     rules: {
+        'vue/comment-directive': OFF,
         'no-console': ERROR,
         'no-restricted-syntax': [
             ERROR,

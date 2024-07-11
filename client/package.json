@@ -8,7 +8,7 @@
         "build": "vue-tsc -b && vite build",
         "lint": "npm run lint:fix",
         "lint:fix": "eslint --ext .ts,.vue src --fix",
-        "lint:check": "eslint --ext .ts,.vue src",
+        "lint:report": "eslint --output-file eslint_report.json --format json --ext .ts,.vue src",
         "preview": "vite preview"
     },
     "dependencies": {
@@ -18,6 +18,7 @@
         "@vitejs/plugin-vue": "^5.0.5",
         "autoprefixer": "^10.4.19",
         "eslint": "^8.57.0",
+        "eslint-plugin-disable": "^2.0.3",
         "eslint-plugin-prettier": "^5.1.3",
         "eslint-plugin-vue": "^9.27.0",
         "postcss": "^8.4.39",
