@@ -40,18 +40,24 @@ module.exports =
                 'message': 'Unexpected property on console object was called'
             }
         ],
-        '@typescript-eslint/explicit-function-return-type': ERROR,
-        '@typescript-eslint/explicit-module-boundary-types': ERROR,
+        '@typescript-eslint/explicit-function-return-type': OFF,
+        '@typescript-eslint/explicit-module-boundary-types': OFF,
         '@typescript-eslint/no-explicit-any': ERROR,
-        "no-unused-vars": OFF,
-        "@typescript-eslint/no-unused-vars": [
+        'no-unused-vars': OFF,
+        '@typescript-eslint/no-unused-vars': [
             ERROR,
             {
-                "argsIgnorePattern": "^_",
-                "varsIgnorePattern": "^_",
-                "caughtErrorsIgnorePattern": "^_"
+                'argsIgnorePattern': '^_',
+                'varsIgnorePattern': '^_',
+                'caughtErrorsIgnorePattern': '^_'
             }
         ],
-        "eqeqeq": ERROR
+        'eqeqeq': ERROR,
+        'vue/html-indent': [ERROR, 4, { 'attribute': 1, 'closeBracket': 1 }],
+        'vue/multi-word-component-names': OFF,
+        'vue/no-template-shadow': OFF,
+        'vue/no-reserved-component-names': OFF,
+        'vue/require-default-prop': OFF,
+        'vue/attribute-hyphenation': OFF,
     },
 }

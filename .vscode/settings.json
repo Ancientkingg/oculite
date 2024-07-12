@@ -1,0 +1,5 @@
+{
+    "alias-resolver.type": "webpack",
+    "alias-resolver.accessPath": "resolve.alias",
+    "alias-resolver.file": "/C:/Users/Familie/Documents/Oculite/client/vite.config.ts"
+}

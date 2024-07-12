@@ -8,3 +8,4 @@ A user-friendly dashboard for monitoring prices and values.
 - [Rocket](https://rocket.rs/)
 - [Vue.js](https://vuejs.org/)
 - [PrimeVue](https://primevue.org/)
+- [Sakai](https://github.com/primefaces/sakai-vue/)

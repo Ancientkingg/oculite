@@ -1,15 +1,7 @@
-<script setup lang="ts">
-import { ref } from 'vue';
-
-const msg = ref('');
-</script>
+<script setup></script>
 
 <template>
-  <main>
-    <h1>Playground</h1>
-    <InputText v-model="msg" />
-    <p>{{ msg }}</p>
-  </main>
+    <router-view />
 </template>
 
 <style scoped></style>

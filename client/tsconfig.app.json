@@ -16,6 +16,8 @@
     "moduleDetection": "force",
     "noEmit": true,
     "jsx": "preserve",
+    "noImplicitAny": false,
+    "allowJs": true,
 
     /* Linting */
     "strict": true,
