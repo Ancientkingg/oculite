@@ -6,8 +6,8 @@ import AppConfig from '@/layout/AppConfig.vue';
     <div class="surface-ground flex align-items-center justify-content-center min-h-screen min-w-screen overflow-hidden">
         <div class="flex flex-column align-items-center justify-content-center">
             <img
-                src="/demo/images/error/logo-error.svg"
-                alt="Sakai logo"
+                src="/layout/images/logo-error.png"
+                alt="Oculite logo"
                 class="mb-5 w-6rem flex-shrink-0"
                 >
             <div style="border-radius: 56px; padding: 0.3rem; background: linear-gradient(180deg, rgba(233, 30, 99, 0.4) 10%, rgba(33, 150, 243, 0) 30%)">
@@ -23,11 +23,11 @@ import AppConfig from '@/layout/AppConfig.vue';
                             <i class="pi pi-fw pi-exclamation-circle text-2xl text-white" />
                         </div>
                         <h1 class="text-900 font-bold text-5xl mb-2">
-                            Error Occured
+                            Error Occurred
                         </h1>
                         <span class="text-600 mb-5">Requested resource is not available.</span>
                         <img
-                            src="/demo/images/error/asset-error.svg"
+                            src="/layout/images/asset-error.svg"
                             alt="Error"
                             class="mb-5"
                             width="80%"

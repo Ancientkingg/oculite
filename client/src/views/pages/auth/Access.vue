@@ -6,8 +6,8 @@ import AppConfig from '@/layout/AppConfig.vue';
     <div class="surface-ground flex align-items-center justify-content-center min-h-screen min-w-screen overflow-hidden">
         <div class="flex flex-column align-items-center justify-content-center">
             <img
-                src="/demo/images/access/logo-orange.svg"
-                alt="Sakai logo"
+                src="/layout/images/logo-error.png"
+                alt="Oculite logo"
                 class="mb-5 w-6rem flex-shrink-0"
                 >
             <div style="border-radius: 56px; padding: 0.3rem; background: linear-gradient(180deg, rgba(247, 149, 48, 0.4) 10%, rgba(247, 149, 48, 0) 30%)">
@@ -25,9 +25,9 @@ import AppConfig from '@/layout/AppConfig.vue';
                         <h1 class="text-900 font-bold text-4xl lg:text-5xl mb-2">
                             Access Denied
                         </h1>
-                        <span class="text-600 mb-5">You do not have the necessary permisions. Please contact admins.</span>
+                        <span class="text-600 mb-5">You do not have the necessary permissions.</span>
                         <img
-                            src="/demo/images/access/asset-access.svg"
+                            src="/layout/images/asset-access.svg"
                             alt="Access denied"
                             class="mb-5"
                             width="80%"

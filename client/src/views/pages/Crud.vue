@@ -235,20 +235,6 @@ const initFilters = () => {
                         </template>
                     </Column>
                     <Column
-                        header="Image"
-                        header-style="width:14%; min-width:10rem;"
-                        >
-                        <template #body="slotProps">
-                            <span class="p-column-title">Image</span>
-                            <img
-                                :src="'/demo/images/product/' + slotProps.data.image"
-                                :alt="slotProps.data.image"
-                                class="shadow-2"
-                                width="100"
-                                >
-                        </template>
-                    </Column>
-                    <Column
                         field="price"
                         header="Price"
                         :sortable="true"
@@ -325,13 +311,6 @@ const initFilters = () => {
                     :modal="true"
                     class="p-fluid"
                     >
-                    <img
-                        v-if="product.image"
-                        :src="'/demo/images/product/' + product.image"
-                        :alt="product.image"
-                        width="150"
-                        class="mt-0 mx-auto mb-5 block shadow-2"
-                        >
                     <div class="field">
                         <label for="name">Name</label>
                         <InputText

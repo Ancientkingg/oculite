@@ -7,7 +7,7 @@ const { layoutConfig, onMenuToggle } = useLayout();
 
 const outsideClickListener = ref(null);
 const topbarMenuActive = ref(false);
-const router = useRouter();
+const _router = useRouter();
 
 onMounted(() => {
     bindOutsideClickListener();
@@ -18,21 +18,38 @@ onBeforeUnmount(() => {
 });
 
 const logoUrl = computed(() => {
-    return `/layout/images/${layoutConfig.darkTheme.value ? 'logo-white' : 'logo-dark'}.svg`;
+    return `/layout/images/${layoutConfig.darkTheme.value ? 'logo-white' : 'logo-dark'}.png`;
 });
 
 const onTopBarMenuButton = () => {
     topbarMenuActive.value = !topbarMenuActive.value;
 };
-const onSettingsClick = () => {
-    topbarMenuActive.value = false;
-    router.push('/documentation');
-};
+
 const topbarMenuClasses = computed(() => {
     return {
         'layout-topbar-menu-mobile-active': topbarMenuActive.value
     };
 });
+
+const categoryName = ref('');
+
+const display = ref(false);
+
+const open = () => {
+    display.value = true;
+};
+
+const cancel = () => {
+    display.value = false;
+};
+
+const confirm = () => {
+    if (categoryName.value === '') return;
+
+    // TODO add category using category service
+
+    display.value = false;
+};
 
 const bindOutsideClickListener = () => {
     if (!outsideClickListener.value) {
@@ -70,7 +87,7 @@ const isOutsideClicked = (event) => {
                 :src="logoUrl"
                 alt="logo"
                 >
-            <span>SAKAI</span>
+            <span>Oculite</span>
         </router-link>
 
         <button
@@ -93,25 +110,47 @@ const isOutsideClicked = (event) => {
             >
             <button
                 class="p-link layout-topbar-button"
-                @click="onTopBarMenuButton()"
+                @click="open"
                 >
-                <i class="pi pi-calendar" />
-                <span>Calendar</span>
+                <i class="pi pi-plus" />
+                <span>Add Category</span>
             </button>
-            <button
-                class="p-link layout-topbar-button"
-                @click="onTopBarMenuButton()"
+            <Dialog
+                v-model:visible="display"
+                header="Add Category"
+                :breakpoints="{ '960px': '75vw' }"
+                :style="{ width: '30vw' }"
+                :modal="true"
+                :dismissableMask="true"
+                :draggable="false"
                 >
-                <i class="pi pi-user" />
-                <span>Profile</span>
-            </button>
-            <button
-                class="p-link layout-topbar-button"
-                @click="onSettingsClick()"
-                >
-                <i class="pi pi-cog" />
-                <span>Settings</span>
-            </button>
+                <div class="p-fluid field pt-4">
+                    <FloatLabel>
+                        <InputText
+                            id="category-name"
+                            v-model="categoryName"
+                            size="large"
+                            type="text"
+                            :invalid="categoryName === ''"
+                            />
+                        <label for="category-name">Name</label>
+                    </FloatLabel>
+                </div>
+                <template #footer>
+                    <Button
+                        label="Cancel"
+                        icon="pi pi-times"
+                        class="p-button-outlined"
+                        @click="cancel"
+                        />
+                    <Button
+                        label="Confirm"
+                        icon="pi pi-check"
+                        class="p-button-outlined"
+                        @click="confirm"
+                        />
+                </template>
+            </Dialog>
         </div>
     </div>
 </template>
