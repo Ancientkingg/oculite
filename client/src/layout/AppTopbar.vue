@@ -1,13 +1,13 @@
-<script setup>
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
+<script setup lang="ts">
+import { ref, computed, onMounted, onBeforeUnmount, Ref } from 'vue';
 import { useLayout } from '@/layout/composables/layout';
-import { useRouter } from 'vue-router';
+import { showToast } from '@/layout/composables/toast';
+import { useToast } from 'primevue/usetoast';
 
 const { layoutConfig, onMenuToggle } = useLayout();
 
-const outsideClickListener = ref(null);
-const topbarMenuActive = ref(false);
-const _router = useRouter();
+const outsideClickListener: Ref = ref(null);
+const topbarMenuActive: Ref<boolean> = ref(false);
 
 onMounted(() => {
     bindOutsideClickListener();
@@ -32,23 +32,27 @@ const topbarMenuClasses = computed(() => {
 });
 
 const categoryName = ref('');
-
+const categoryUrl = ref('');
 const display = ref(false);
 
 const open = () => {
     display.value = true;
 };
 
+const toast = useToast();
+
 const cancel = () => {
     display.value = false;
+    showToast(toast, 'error', 'Cancelled', 'Category addition cancelled', 1000);
 };
 
 const confirm = () => {
-    if (categoryName.value === '') return;
+    if (categoryName.value === '' || categoryUrl.value === '') return;
 
     // TODO add category using category service
 
     display.value = false;
+    showToast(toast, 'success', 'Success', 'Category added successfully', 1000);
 };
 
 const bindOutsideClickListener = () => {
@@ -63,7 +67,7 @@ const bindOutsideClickListener = () => {
 };
 const unbindOutsideClickListener = () => {
     if (outsideClickListener.value) {
-        document.removeEventListener('click', outsideClickListener);
+        document.removeEventListener('click', outsideClickListener.value);
         outsideClickListener.value = null;
     }
 };
@@ -73,7 +77,7 @@ const isOutsideClicked = (event) => {
     const sidebarEl = document.querySelector('.layout-topbar-menu');
     const topbarEl = document.querySelector('.layout-topbar-menu-button');
 
-    return !(sidebarEl.isSameNode(event.target) || sidebarEl.contains(event.target) || topbarEl.isSameNode(event.target) || topbarEl.contains(event.target));
+    return !(sidebarEl!.isSameNode(event.target) || sidebarEl!.contains(event.target) || topbarEl!.isSameNode(event.target) || topbarEl!.contains(event.target));
 };
 </script>
 
@@ -134,6 +138,18 @@ const isOutsideClicked = (event) => {
                             :invalid="categoryName === ''"
                             />
                         <label for="category-name">Name</label>
+                    </FloatLabel>
+                </div>
+                <div class="p-fluid field pt-3">
+                    <FloatLabel>
+                        <InputText
+                            id="category-url"
+                            v-model="categoryUrl"
+                            size="large"
+                            type="text"
+                            :invalid="categoryUrl === ''"
+                            />
+                        <label for="category-url">Url</label>
                     </FloatLabel>
                 </div>
                 <template #footer>

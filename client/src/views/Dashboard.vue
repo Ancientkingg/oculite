@@ -3,6 +3,8 @@
 import { onMounted, reactive, ref, watch } from 'vue';
 import { useLayout } from '@/layout/composables/layout';
 
+import '@/layout/composables/toast';
+
 const { isDarkTheme } = useLayout();
 
 const items = ref(null);
