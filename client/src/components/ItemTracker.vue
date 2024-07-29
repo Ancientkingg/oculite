@@ -26,7 +26,7 @@ const chartData = reactive({
             data: props.priceData,
             fill: true,
             tension: 0.4,
-            backgroundColor: (context, scales) => {
+            backgroundColor: (context, _scales) => {
                 if (!context.chart.chartArea) return;
 
                 const backgroundColor = documentStyle.getPropertyValue('--primary-500');
