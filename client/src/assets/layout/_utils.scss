@@ -1,11 +1,13 @@
 /* Utils */
 .clearfix:after {
-    content: " ";
+    content: ' ';
     display: block;
     clear: both;
 }
 
 .card {
+    display: flex;
+    flex-direction: column;
     background: var(--surface-card);
     border: 1px solid var(--surface-border);
     padding: 2rem;
@@ -15,6 +17,15 @@
 
     &:last-child {
         margin-bottom: 0;
+    }
+}
+
+.card-clickable {
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+
+    &:hover {
+        background-color: var(--surface-hover);
     }
 }
 

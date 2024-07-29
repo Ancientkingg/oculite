@@ -1,16 +1,13 @@
-<script setup>
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { onMounted, reactive, ref, watch } from 'vue';
+<script setup lang="ts">
+import { Ref, ref, watch } from 'vue';
 import { useLayout } from '@/layout/composables/layout';
-
-import '@/layout/composables/toast';
 
 const { isDarkTheme } = useLayout();
 
-const items = ref(null);
-const lineOptions = ref(null);
+const items: Ref = ref(null);
+const lineOptions: Ref = ref(null);
 
-const formatCurrency = (value) => {
+const formatCurrency = (value: { toLocaleString: (arg0: string, arg1: { style: string; currency: string; }) => unknown; }) => {
     return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
 };
 const applyLightTheme = () => {

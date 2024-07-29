@@ -42,7 +42,7 @@ module.exports =
         ],
         '@typescript-eslint/explicit-function-return-type': OFF,
         '@typescript-eslint/explicit-module-boundary-types': OFF,
-        '@typescript-eslint/no-explicit-any': ERROR,
+        '@typescript-eslint/no-explicit-any': OFF,
         'no-unused-vars': OFF,
         '@typescript-eslint/no-unused-vars': [
             ERROR,
