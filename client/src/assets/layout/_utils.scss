@@ -20,6 +20,34 @@
     }
 }
 
+.card-details {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.card-divider {
+    
+}
+
+.card-price-details {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: end;
+    width: 100%;
+}
+
+.card-price-divider {
+    width: 3px;
+}
+
+.card-price-percentage {
+    font-size: 0.85rem;
+    opacity: 80%;
+}
+
 .card-clickable {
     cursor: pointer;
     transition: all 0.2s ease-in-out;
