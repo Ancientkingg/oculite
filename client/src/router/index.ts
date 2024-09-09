@@ -16,7 +16,7 @@ const router = createRouter({
                     component: () => import('@/views/Dashboard.vue'),
                 },
                 {
-                    path: '/test/category',
+                    path: '/category/0',
                     name: 'category',
                     component: () => import('@/views/pages/Category.vue'),
                 },

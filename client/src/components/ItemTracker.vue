@@ -24,6 +24,8 @@ const props = withDefaults(defineProps<Props>(), {
     link: () => 'https://google.com',
 });
 
+const isFavorite = defineModel<boolean>();
+
 const latestPrice = computed(() => {
     return props.priceData.prices[props.priceData.prices.length - 1].toFixed(2);
 });
@@ -113,6 +115,12 @@ const overlayPanelTrigger = ref();
 const triggerOverlay = (e) => {
     overlayPanelTrigger.value.toggle(e);
 }
+
+const favorite = () => {
+    isFavorite.value = !isFavorite.value;
+
+    // TODO: send favorite status to the server
+}
 </script>
 
 <template>
@@ -148,17 +156,25 @@ const triggerOverlay = (e) => {
                 :data="chartData"
                 :options="chartOptions"
                 />
-            <a
-                :href="link"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="w-full h-3rem"
-                >
+            <div class="w-full flex gap-2 justify-between px-1">
+                <a
+                    :href="link"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="w-full h-3rem flex gap-2"
+                    >
+                    <Button
+                        class="w-full h-full"
+                        label="Visit"
+                        />
+                </a>
                 <Button
-                    class="w-full h-full"
-                    label="Visit"
+                    class="w-2 h-3rem bg-pink-100 border-0 hover:bg-pink-200"
+                    :icon="`pi ${isFavorite ? 'pi-heart-fill' : 'pi-heart'} text-xl text-pink-500`"
+                    aria-label="Favorite"
+                    @click="favorite"
                     />
-            </a>
+            </div>
         </div>
     </OverlayPanel>
 </template>
