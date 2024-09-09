@@ -37,21 +37,44 @@ class ItemTrackerService {
         });
     }
 
-    getAllItemTrackers(category: Category) {
+    getAllItemTrackerIds(category: Category) {
         const { isPending, isError, data, error } = useQuery({
             queryKey: ['categories', category.getId()],
-            queryFn: () => this.fetchItemTrackers(category.getId()),
+            queryFn: () => this.fetchItemTrackerIds(category.getId()),
         });
 
         return { isPending, isError, data, error };
     }
 
-    private async fetchItemTrackers(
-        categoryId: number,
-    ): Promise<ItemTracker[]> {
+    getItemTracker(id: number) {
+        const { isPending, isError, data, error } = useQuery({
+            queryKey: ['item-tracker', id],
+            queryFn: () => this.fetchItemTracker(id),
+        });
+
+        return { isPending, isError, data, error };
+    }
+
+    private async fetchItemTracker(id: number): Promise<ItemTracker> {
+        return fetch(`item-trackers/${id}`, { method: 'GET' })
+            .then((res) => res.json())
+            .then((data) => {
+                return new ItemTracker(
+                    data.id,
+                    data.name,
+                    data.priceData,
+                    data.currency,
+                    data.icon,
+                    data.link,
+                    data.favorite,
+                );
+            });
+    }
+
+    private async fetchItemTrackerIds(categoryId: number): Promise<number[]> {
         return fetch(`item-trackers/${categoryId}`, { method: 'GET' })
             .then((res) => res.json())
-            .then((data) => data.data);
+            .then((data) => data.ids);
     }
 
     favorite(item: ItemTracker) {
