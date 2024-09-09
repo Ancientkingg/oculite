@@ -1,19 +1,17 @@
-<script setup>
-import { ref, computed } from 'vue';
+<script lang="ts" setup>
+import { computed, reactive } from 'vue';
 
 import AppMenuItem from './AppMenuItem.vue';
-import categoryService from '@/service/categoryService';
+import categoryService from '@/services/categoryService';
+import Category from '@/model/Category';
 
-const categories = ref([]);
-categoryService.getCategories().then(c => {
-    categories.value = c;
-});
+const categories = reactive(categoryService.getAllCategories());
 
-const categoryItems = computed(() =>
-    categories.value.map(category => ({
-        label: category.name,
+const categoryItems = computed(() => categories.isPending ? [] :
+    categories.data!.map((category: Category) => ({
+        label: category.getName(),
         icon: 'pi pi-fw pi-list',
-        to: `/category/${category.id}`
+        to: `/category/${category.getId()}`
     })))
 
 const model = computed(() => [
@@ -35,12 +33,10 @@ const model = computed(() => [
             :key="item"
             >
             <app-menu-item
-                v-if="!item.separator"
                 :item="item"
                 :index="i"
                 />
             <li
-                v-if="item.separator"
                 class="menu-separator"
                 />
         </template>
