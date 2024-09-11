@@ -101,8 +101,6 @@ watch(
                         <i class="pi pi-eye text-blue-500 text-xl" />
                     </div>
                 </div>
-                <span class="text-green-500 font-medium">24 new </span>
-                <span class="text-500">since last visit</span>
             </div>
         </div>
         <div class="col-12 lg:col-6 xl:col-3">
@@ -121,8 +119,6 @@ watch(
                         <i class="pi pi-caret-up text-red-500 text-xl" />
                     </div>
                 </div>
-                <span class="text-green-500 font-medium">24 new </span>
-                <span class="text-500">since last visit</span>
             </div>
         </div>
         <div class="col-12 lg:col-6 xl:col-3">
@@ -141,8 +137,6 @@ watch(
                         <i class="pi pi-caret-down text-green-500 text-xl" />
                     </div>
                 </div>
-                <span class="text-green-500 font-medium">24 new </span>
-                <span class="text-500">since last visit</span>
             </div>
         </div>
         <div class="col-12 lg:col-6 xl:col-3">
@@ -161,8 +155,6 @@ watch(
                         <i class="pi pi-minus text-gray-500 text-xl" />
                     </div>
                 </div>
-                <span class="text-green-500 font-medium">520 </span>
-                <span class="text-500">newly registered</span>
             </div>
         </div>
         <div class="col-12 xl:col-6">

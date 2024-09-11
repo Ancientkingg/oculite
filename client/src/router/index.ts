@@ -1,7 +1,10 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import AppLayout from '@/layout/AppLayout.vue';
+import Category from '@/model/Category.ts';
 
 // TODO - Fetch all category using category service and convert them to routes
+
+const fakeCategory = new Category(1, 'blabla');
 
 const router = createRouter({
     history: createWebHistory(),
@@ -19,6 +22,7 @@ const router = createRouter({
                     path: '/category/0',
                     name: 'category',
                     component: () => import('@/views/pages/Category.vue'),
+                    props: { category: fakeCategory },
                 },
             ],
         },
