@@ -7,6 +7,11 @@ import { fileURLToPath, URL } from 'node:url';
 
 // https://vitejs.dev/config/
 export default defineConfig({
+    esbuild: {
+        supported: {
+            'top-level-await': true
+        }
+    },
     plugins: [
         vue(),
         Components({
