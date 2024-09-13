@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/vue-query';
+import { reactive } from 'vue';
 
 export interface TrackerStats {
     total: number;
@@ -10,11 +11,13 @@ export interface TrackerStats {
 export interface Notification {
     message: string;
     icon: string;
+    color: string;
+    date: Date;
 }
 
 class StatsService {
     async fetchHealth() {
-        return fetch('health', { method: 'GET' });
+        return fetch(process.env.API_BASE_URL + 'health', { method: 'GET' });
     }
 
     async serverIsOk(): Promise<boolean> {
@@ -27,11 +30,11 @@ class StatsService {
             queryFn: () => this.fetchTrackerStats(),
         });
 
-        return { isPending, isError, data, error };
+        return reactive({ isPending, isError, data, error });
     }
 
     private async fetchTrackerStats(): Promise<TrackerStats> {
-        return fetch('trackers', { method: 'GET' })
+        return fetch(process.env.API_BASE_URL + 'trackers', { method: 'GET' })
             .then((res) => res.json())
             .then((data) => {
                 return {
@@ -49,11 +52,13 @@ class StatsService {
             queryFn: () => this.fetchNotifications(),
         });
 
-        return { isPending, isError, data, error };
+        return reactive({ isPending, isError, data, error });
     }
 
     private async fetchNotifications(): Promise<Notification[]> {
-        return fetch('notifications', { method: 'GET' })
+        return fetch(process.env.API_BASE_URL + 'notifications', {
+            method: 'GET',
+        })
             .then((res) => res.json())
             .then((data) => {
                 return data.data.map((notification: any) => {
@@ -71,11 +76,13 @@ class StatsService {
             queryFn: () => this.fetchFavoriteTrackers(),
         });
 
-        return { isPending, isError, data, error };
+        return reactive({ isPending, isError, data, error });
     }
 
     private async fetchFavoriteTrackers(): Promise<number[]> {
-        return fetch('favorite-trackers', { method: 'GET' })
+        return fetch(process.env.API_BASE_URL + 'favorite-trackers', {
+            method: 'GET',
+        })
             .then((res) => res.json())
             .then((data) => data.data);
     }

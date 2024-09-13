@@ -2,6 +2,7 @@
 import Category from '@/model/Category';
 import { getAllItemTrackerIds, getItemTracker } from '@/services/itemTrackerService';
 import { computed, getCurrentInstance, getCurrentScope, reactive, watch } from 'vue';
+import ItemTrackerModel from '@/model/ItemTracker'
 
 const props = defineProps<{ category: Category }>();
 
@@ -13,7 +14,12 @@ const fetchedItemTrackers = getAllItemTrackerIds(props.category);
 
 const isLoading = computed(() => fetchedItemTrackers.isPending || fetchedItemTrackers.isError);
 
-const itemTrackerResponses: { data: any[] } = reactive({ data: [] })
+const itemTrackerResponses: { data: {
+    isPending: boolean;
+    isError: boolean;
+    data: ItemTrackerModel | undefined;
+    error: Error | null;
+}[] } = reactive({ data: [] });
 
 const scope = getCurrentScope();
 const app = getCurrentInstance();

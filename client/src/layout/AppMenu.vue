@@ -3,12 +3,11 @@ import { computed, reactive } from 'vue';
 
 import AppMenuItem from './AppMenuItem.vue';
 import categoryService from '@/services/categoryService';
-import Category from '@/model/Category';
 
 const categories = reactive(categoryService.getAllCategories());
 
 const categoryItems = computed(() => categories.isPending ? [] :
-    categories.data!.map((category: Category) => ({
+    categories.data!.map((category) => ({
         label: category.getName(),
         icon: 'pi pi-fw pi-list',
         to: `/category/${category.getId()}`

@@ -3,6 +3,7 @@ import { ref, computed, onMounted, onBeforeUnmount, Ref } from 'vue';
 import { useLayout } from '@/layout/composables/layout';
 import { showToast } from '@/layout/composables/toast';
 import { useToast } from 'primevue/usetoast';
+import categoryService from '@/services/categoryService';
 
 const { layoutConfig, onMenuToggle } = useLayout();
 
@@ -46,18 +47,23 @@ const cancel = () => {
     showToast(toast, 'error', 'Cancelled', 'Category addition cancelled', 1000);
 };
 
-const confirm = () => {
+const confirm = async () => {
     if (categoryName.value === '' || categoryUrl.value === '') return;
 
-    // TODO add category using category service
+    const responseStatus = await categoryService.addCategory(categoryName.value, categoryUrl.value);
 
     display.value = false;
-    showToast(toast, 'success', 'Success', 'Category added successfully', 1000);
+
+    if (responseStatus === 200) {
+        showToast(toast, 'success', 'Success', 'Category added successfully', 1000);
+    } else {
+        showToast(toast, 'error', 'Error', 'Could not add category', 1000);
+    }
 };
 
 const bindOutsideClickListener = () => {
     if (!outsideClickListener.value) {
-        outsideClickListener.value = (event) => {
+        outsideClickListener.value = (event: any) => {
             if (isOutsideClicked(event)) {
                 topbarMenuActive.value = false;
             }

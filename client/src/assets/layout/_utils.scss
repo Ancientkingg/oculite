@@ -5,6 +5,19 @@
     clear: both;
 }
 
+.notification-item {
+    display: flex;
+    align-items: center;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+}
+
+.notification-item:not(:last-child) {
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+    border-color: var(--surface-border);
+}
+
 .card {
     display: flex;
     flex-direction: column;

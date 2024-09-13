@@ -1,10 +1,17 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import AppLayout from '@/layout/AppLayout.vue';
-import Category from '@/model/Category.ts';
+import categoryService from '@/services/categoryService';
+import { QueryClient } from '@tanstack/vue-query';
 
-// TODO - Fetch all category using category service and convert them to routes
+const queryClient = new QueryClient();
+const categories = await categoryService.fetchAllCategories(queryClient);
 
-const fakeCategory = new Category(1, 'blabla');
+const categoryRoutes = categories.map((category) => ({
+    path: `/category/${category.getId()}`,
+    name: category.getName(),
+    component: () => import('@/views/pages/Category.vue'),
+    props: { category },
+}));
 
 const router = createRouter({
     history: createWebHistory(),
@@ -18,33 +25,13 @@ const router = createRouter({
                     name: 'dashboard',
                     component: () => import('@/views/Dashboard.vue'),
                 },
-                {
-                    path: '/category/0',
-                    name: 'category',
-                    component: () => import('@/views/pages/Category.vue'),
-                    props: { category: fakeCategory },
-                },
+                ...categoryRoutes,
             ],
         },
         {
-            path: '/pages/notfound',
+            path: '/:pathMatch(.*)*',
             name: 'notfound',
             component: () => import('@/views/pages/NotFound.vue'),
-        },
-        {
-            path: '/auth/login',
-            name: 'login',
-            component: () => import('@/views/pages/auth/Login.vue'),
-        },
-        {
-            path: '/auth/access',
-            name: 'accessDenied',
-            component: () => import('@/views/pages/auth/Access.vue'),
-        },
-        {
-            path: '/auth/error',
-            name: 'error',
-            component: () => import('@/views/pages/auth/Error.vue'),
         },
     ],
 });

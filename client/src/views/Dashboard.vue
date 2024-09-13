@@ -1,14 +1,43 @@
 <script setup lang="ts">
-import { Ref, ref, watch } from 'vue';
+import { Ref, ref, watch, reactive, computed, getCurrentScope, getCurrentInstance } from 'vue';
 import { useLayout } from '@/layout/composables/layout';
 
 const { isDarkTheme } = useLayout();
 
-const items: Ref = ref(null);
+import statsService from '@/services/statsService';
+import { getItemTracker } from '@/services/itemTrackerService';
+import ItemTracker from '@/model/ItemTracker';
+
+
+const trackerStats = statsService.getTrackerStats();
+const favoritedTrackers = statsService.getFavoriteTrackers();
+
+const itemTrackerResponses: { data: {
+    isPending: boolean;
+    isError: boolean;
+    data: ItemTracker | undefined;
+    error: Error | null;
+}[] } = reactive({ data: [] });
+
+const favoritedIsLoading = computed(() => favoritedTrackers.isPending || favoritedTrackers.isError);
+
+const notificationsResponse = statsService.getNotifications();
+
+const scope = getCurrentScope();
+const app = getCurrentInstance();
+
+watch(favoritedTrackers, () => {
+    scope?.run(() => {
+        app?.appContext.app.runWithContext(() => {
+            itemTrackerResponses.data = favoritedIsLoading.value ? [] : favoritedTrackers.data!.map((id) => getItemTracker(id))
+        })
+    })
+}, { immediate: true })
+
 const lineOptions: Ref = ref(null);
 
 const formatCurrency = (value: { toLocaleString: (arg0: string, arg1: { style: string; currency: string; }) => unknown; }) => {
-    return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+    return value.toLocaleString('en-US', { style: 'currency', currency: 'EUR' });
 };
 const applyLightTheme = () => {
     lineOptions.value = {
@@ -90,8 +119,17 @@ watch(
                 <div class="flex justify-content-between mb-3">
                     <div>
                         <span class="block text-500 font-medium mb-3">Watching</span>
-                        <div class="text-900 font-medium text-xl">
-                            152
+                        <ProgressSpinner
+                            v-if="!trackerStats.data"
+                            style="width: 16px; height: 16px"
+                            strokeWidth="8"
+                            animationDuration=".5s"
+                            />
+                        <div
+                            v-else
+                            class="text-900 font-medium text-xl"
+                            >
+                            {{ trackerStats.data.total }}
                         </div>
                     </div>
                     <div
@@ -108,8 +146,17 @@ watch(
                 <div class="flex justify-content-between mb-3">
                     <div>
                         <span class="block text-500 font-medium mb-3">Rising Trackers</span>
-                        <div class="text-900 font-medium text-xl">
-                            152
+                        <ProgressSpinner
+                            v-if="!trackerStats.data"
+                            style="width: 16px; height: 16px"
+                            strokeWidth="8"
+                            animationDuration=".5s"
+                            />
+                        <div
+                            v-else
+                            class="text-900 font-medium text-xl"
+                            >
+                            {{ trackerStats.data.rising }}
                         </div>
                     </div>
                     <div
@@ -126,8 +173,17 @@ watch(
                 <div class="flex justify-content-between mb-3">
                     <div>
                         <span class="block text-500 font-medium mb-3">Falling Trackers</span>
-                        <div class="text-900 font-medium text-xl">
-                            152
+                        <ProgressSpinner
+                            v-if="!trackerStats.data"
+                            style="width: 16px; height: 16px"
+                            strokeWidth="8"
+                            animationDuration=".5s"
+                            />
+                        <div
+                            v-else
+                            class="text-900 font-medium text-xl"
+                            >
+                            {{ trackerStats.data.falling }}
                         </div>
                     </div>
                     <div
@@ -144,8 +200,17 @@ watch(
                 <div class="flex justify-content-between mb-3">
                     <div>
                         <span class="block text-500 font-medium mb-3">Stale Trackers</span>
-                        <div class="text-900 font-medium text-xl">
-                            28441
+                        <ProgressSpinner
+                            v-if="!trackerStats.data"
+                            style="width: 16px; height: 16px"
+                            strokeWidth="8"
+                            animationDuration=".5s"
+                            />
+                        <div
+                            v-else
+                            class="text-900 font-medium text-xl"
+                            >
+                            {{ trackerStats.data.stale }}
                         </div>
                     </div>
                     <div
@@ -169,42 +234,91 @@ watch(
                     </div>
                 </div>
                 <DataTable
-                    :value="items"
+                    :value="itemTrackerResponses.data"
                     :rows="5"
                     :paginator="true"
                     responsive-layout="scroll"
+                    :loading="favoritedIsLoading"
                     >
                     <Column style="width: 15%">
                         <template #header>
                             Image
                         </template>
+                        <template #body="slotProps">
+                            <ProgressSpinner
+                                v-if="!slotProps.data.data"
+                                style="width: 16px; height: 16px"
+                                strokeWidth="8"
+                                animationDuration=".5s"
+                                />
+                            <img
+                                v-else
+                                :src="slotProps.data.data.icon"
+                                class="w-5rem border-round"
+                                >
+                        </template>
                     </Column>
                     <Column
-                        field="name"
                         header="Name"
                         :sortable="true"
                         style="width: 35%"
-                        />
+                        >
+                        <template #body="slotProps">
+                            <ProgressSpinner
+                                v-if="!slotProps.data.data"
+                                style="width: 16px; height: 16px"
+                                strokeWidth="8"
+                                animationDuration=".5s"
+                                />
+                            <div v-else>
+                                {{ !slotProps.data.data ? '' : slotProps.data.data.getName() }}
+                            </div>
+                        </template>
+                    </Column>
                     <Column
-                        field="price"
                         header="Price"
                         :sortable="true"
                         style="width: 35%"
                         >
                         <template #body="slotProps">
-                            {{ formatCurrency(slotProps.data.price) }}
+                            <ProgressSpinner
+                                v-if="!slotProps.data.data"
+                                style="width: 16px; height: 16px"
+                                strokeWidth="8"
+                                animationDuration=".5s"
+                                />
+                            <div v-else>
+                                {{ !slotProps.data.data ? 0 : formatCurrency(slotProps.data.data.getLatestPrice()) }}
+                            </div>
                         </template>
                     </Column>
-                    <Column style="width: 15%">
+                    <Column
+                        field="url"
+                        style="width: 15%"
+                        >
                         <template #header>
                             View
                         </template>
-                        <template #body>
-                            <Button
-                                icon="pi pi-search"
-                                type="button"
-                                class="p-button-text"
+                        <template #body="slotProps">
+                            <ProgressSpinner
+                                v-if="!slotProps.data.data"
+                                style="width: 16px; height: 16px"
+                                strokeWidth="8"
+                                animationDuration=".5s"
                                 />
+                            <a
+                                v-else
+                                :href="!slotProps.data.data ? '' : slotProps.data.data.link"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="w-full h-3rem flex gap-2"
+                                >
+                                <Button
+                                    icon="pi pi-search"
+                                    type="button"
+                                    class="p-button-text w-8"
+                                    />
+                            </a>
                         </template>
                     </Column>
                 </DataTable>
@@ -221,44 +335,18 @@ watch(
                         <i class="pi pi-send text-purple-500 text-xl" />
                     </div>
                 </div>
-
-                <span class="block text-600 font-medium mb-3">TODAY</span>
-                <ul class="p-0 mx-0 mt-0 mb-4 list-none">
-                    <li class="flex align-items-center py-2 border-bottom-1 surface-border">
-                        <div class="w-3rem h-3rem flex align-items-center justify-content-center bg-blue-100 border-circle mr-3 flex-shrink-0">
-                            <i class="pi pi-dollar text-xl text-blue-500" />
-                        </div>
-                        <span class="text-900 line-height-3">Richard Jones
-                            <span class="text-700">has purchased a blue t-shirt for <span class="text-blue-500">79$</span></span>
-                        </span>
-                    </li>
-                    <li class="flex align-items-center py-2">
-                        <div class="w-3rem h-3rem flex align-items-center justify-content-center bg-orange-100 border-circle mr-3 flex-shrink-0">
-                            <i class="pi pi-download text-xl text-orange-500" />
-                        </div>
-                        <span class="text-700 line-height-3">Your request for withdrawal of <span class="text-blue-500 font-medium">2500$</span> has been initiated.</span>
-                    </li>
-                </ul>
-
-                <span class="block text-600 font-medium mb-3">YESTERDAY</span>
-                <ul class="p-0 m-0 list-none">
-                    <li class="flex align-items-center py-2 border-bottom-1 surface-border">
-                        <div class="w-3rem h-3rem flex align-items-center justify-content-center bg-blue-100 border-circle mr-3 flex-shrink-0">
-                            <i class="pi pi-dollar text-xl text-blue-500" />
-                        </div>
-                        <span class="text-900 line-height-3">Keyser Wick
-                            <span class="text-700">has purchased a black jacket for <span class="text-blue-500">59$</span></span>
-                        </span>
-                    </li>
-                    <li class="flex align-items-center py-2 border-bottom-1 surface-border">
-                        <div class="w-3rem h-3rem flex align-items-center justify-content-center bg-pink-100 border-circle mr-3 flex-shrink-0">
-                            <i class="pi pi-question text-xl text-pink-500" />
-                        </div>
-                        <span class="text-900 line-height-3">Jane Davis
-                            <span class="text-700">has posted a new questions about your product.</span>
-                        </span>
-                    </li>
-                </ul>
+                <ProgressSpinner
+                    v-if="!notificationsResponse.data"
+                    style="width: 48px; height: 25rem"
+                    strokeWidth="8"
+                    animationDuration=".5s"
+                    />
+                <div
+                    v-else
+                    style="max-height: 25rem; overflow-y: auto;"
+                    >
+                    <NotificationBlock :notifications="notificationsResponse.data" />
+                </div>
             </div>
         </div>
     </div>

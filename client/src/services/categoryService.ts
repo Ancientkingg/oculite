@@ -1,5 +1,6 @@
 import Category from '@/model/Category';
-import { useQuery } from '@tanstack/vue-query';
+import { QueryClient, useQuery } from '@tanstack/vue-query';
+import { reactive } from 'vue';
 
 class CategoryService {
     getAllCategories() {
@@ -8,13 +9,33 @@ class CategoryService {
             queryFn: this.fetchCategories,
         });
 
-        return { isPending, isError, data, error };
+        return reactive({ isPending, isError, data, error });
+    }
+
+    async fetchAllCategories(queryClient: QueryClient) {
+        return queryClient.fetchQuery({
+            queryKey: ['categories'],
+            queryFn: this.fetchCategories,
+        });
     }
 
     private async fetchCategories(): Promise<Category[]> {
-        return new Promise((resolve) => {
-            setTimeout(() => resolve([new Category(0, 'blabla')]), 1000);
+        return fetch(process.env.API_BASE_URL + 'fetchCategory', {
+            method: 'GET',
+        })
+            .then((res) => res.json())
+            .then((data) => data.data);
+    }
+
+    async addCategory(
+        categoryName: string,
+        categoryUrl: string,
+    ): Promise<number> {
+        const response = await fetch(process.env.API_BASE_URL + 'addCategory', {
+            method: 'POST',
+            body: JSON.stringify({ categoryName, categoryUrl }),
         });
+        return response.status;
     }
 }
 
