@@ -2,9 +2,9 @@
 import { computed, reactive } from 'vue';
 
 import AppMenuItem from './AppMenuItem.vue';
-import categoryService from '@/services/categoryService';
+import { getAllCategories } from '@/services/categoryService';
 
-const categories = reactive(categoryService.getAllCategories());
+const categories = reactive(getAllCategories());
 
 const categoryItems = computed(() => categories.isPending ? [] :
     categories.data!.map((category) => ({

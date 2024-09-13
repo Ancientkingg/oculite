@@ -3,7 +3,7 @@ import { ref, computed, onMounted, onBeforeUnmount, Ref } from 'vue';
 import { useLayout } from '@/layout/composables/layout';
 import { showToast } from '@/layout/composables/toast';
 import { useToast } from 'primevue/usetoast';
-import categoryService from '@/services/categoryService';
+import { addCategory } from '@/services/categoryService';
 
 const { layoutConfig, onMenuToggle } = useLayout();
 
@@ -50,7 +50,7 @@ const cancel = () => {
 const confirm = async () => {
     if (categoryName.value === '' || categoryUrl.value === '') return;
 
-    const responseStatus = await categoryService.addCategory(categoryName.value, categoryUrl.value);
+    const responseStatus = await addCategory(categoryName.value, categoryUrl.value);
 
     display.value = false;
 
