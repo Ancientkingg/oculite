@@ -22,7 +22,7 @@ export function getItemTracker(id: number) {
 }
 
 async function fetchItemTracker(id: number): Promise<ItemTracker> {
-    return fetch(process.env.API_BASE_URL + `item-trackers/${id}`, {
+    return fetch(import.meta.env.VITE_API_BASE_URL + `item-trackers/${id}`, {
         method: 'GET',
     })
         .then((res) => res.json())
@@ -40,9 +40,12 @@ async function fetchItemTracker(id: number): Promise<ItemTracker> {
 }
 
 async function fetchAllItemTrackerIds(categoryId: number): Promise<number[]> {
-    return fetch(process.env.API_BASE_URL + `item-trackers/${categoryId}`, {
-        method: 'GET',
-    })
+    return fetch(
+        import.meta.env.VITE_API_BASE_URL + `item-trackers/${categoryId}`,
+        {
+            method: 'GET',
+        },
+    )
         .then((res) => res.json())
         .then((data) => data.ids);
 }
@@ -51,7 +54,7 @@ export function favorite(item: ItemTracker) {
     const queryClient = useQueryClient();
     const favoriteMutation = useMutation({
         mutationFn: (itemTrackerId: number) =>
-            fetch(process.env.API_BASE_URL + 'favorite', {
+            fetch(import.meta.env.VITE_API_BASE_URL + 'favorite', {
                 method: 'PUT',
                 body: JSON.stringify({ itemTrackerId }),
             }).then((res) => res.json()),
@@ -70,7 +73,7 @@ export function unfavorite(item: ItemTracker) {
     const queryClient = useQueryClient();
     const unFavoriteMutation = useMutation({
         mutationFn: (itemTrackerId: number) =>
-            fetch(process.env.API_BASE_URL + 'unfavorite', {
+            fetch(import.meta.env.VITE_API_BASE_URL + 'unfavorite', {
                 method: 'PUT',
                 body: JSON.stringify({ itemTrackerId }),
             }).then((res) => res.json()),

@@ -4,7 +4,16 @@ import categoryService from '@/services/categoryService';
 import { QueryClient } from '@tanstack/vue-query';
 
 const queryClient = new QueryClient();
-const categories = await categoryService.fetchAllCategories(queryClient);
+
+const categories = await (async () => {
+    try {
+        const categories =
+            await categoryService.fetchAllCategories(queryClient);
+        return categories;
+    } catch (e) {
+        return [];
+    }
+})();
 
 const categoryRoutes = categories.map((category) => ({
     path: `/category/${category.getId()}`,

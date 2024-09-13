@@ -20,7 +20,7 @@ class CategoryService {
     }
 
     private async fetchCategories(): Promise<Category[]> {
-        return fetch(process.env.API_BASE_URL + 'fetchCategory', {
+        return fetch(import.meta.env.VITE_API_BASE_URL + 'fetchCategory', {
             method: 'GET',
         })
             .then((res) => res.json())
@@ -31,10 +31,13 @@ class CategoryService {
         categoryName: string,
         categoryUrl: string,
     ): Promise<number> {
-        const response = await fetch(process.env.API_BASE_URL + 'addCategory', {
-            method: 'POST',
-            body: JSON.stringify({ categoryName, categoryUrl }),
-        });
+        const response = await fetch(
+            import.meta.env.VITE_API_BASE_URL + 'addCategory',
+            {
+                method: 'POST',
+                body: JSON.stringify({ categoryName, categoryUrl }),
+            },
+        );
         return response.status;
     }
 }

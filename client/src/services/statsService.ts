@@ -17,7 +17,9 @@ export interface Notification {
 
 class StatsService {
     async fetchHealth() {
-        return fetch(process.env.API_BASE_URL + 'health', { method: 'GET' });
+        return fetch(import.meta.env.VITE_API_BASE_URL + 'health', {
+            method: 'GET',
+        });
     }
 
     async serverIsOk(): Promise<boolean> {
@@ -34,7 +36,9 @@ class StatsService {
     }
 
     private async fetchTrackerStats(): Promise<TrackerStats> {
-        return fetch(process.env.API_BASE_URL + 'trackers', { method: 'GET' })
+        return fetch(import.meta.env.VITE_API_BASE_URL + 'trackers', {
+            method: 'GET',
+        })
             .then((res) => res.json())
             .then((data) => {
                 return {
@@ -56,7 +60,7 @@ class StatsService {
     }
 
     private async fetchNotifications(): Promise<Notification[]> {
-        return fetch(process.env.API_BASE_URL + 'notifications', {
+        return fetch(import.meta.env.VITE_API_BASE_URL + 'notifications', {
             method: 'GET',
         })
             .then((res) => res.json())
@@ -80,7 +84,7 @@ class StatsService {
     }
 
     private async fetchFavoriteTrackers(): Promise<number[]> {
-        return fetch(process.env.API_BASE_URL + 'favorite-trackers', {
+        return fetch(import.meta.env.VITE_API_BASE_URL + 'favorite-trackers', {
             method: 'GET',
         })
             .then((res) => res.json())
