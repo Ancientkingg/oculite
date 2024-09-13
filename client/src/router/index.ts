@@ -1,14 +1,13 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import AppLayout from '@/layout/AppLayout.vue';
-import categoryService from '@/services/categoryService';
 import { QueryClient } from '@tanstack/vue-query';
+import { fetchAllCategories } from '@/services/categoryService';
 
 const queryClient = new QueryClient();
 
 const categories = await (async () => {
     try {
-        const categories =
-            await categoryService.fetchAllCategories(queryClient);
+        const categories = await fetchAllCategories(queryClient);
         return categories;
     } catch (e) {
         return [];

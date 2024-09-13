@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-    import { Notification } from '@/services/statsService';
+    import Notification from '@/model/Notification';
 
     interface Props {
         notification: Notification

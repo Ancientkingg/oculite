@@ -3,14 +3,13 @@ import { Ref, ref, watch, reactive, computed, getCurrentScope, getCurrentInstanc
 import { useLayout } from '@/layout/composables/layout';
 
 const { isDarkTheme } = useLayout();
-
-import statsService from '@/services/statsService';
 import { getItemTracker } from '@/services/itemTrackerService';
 import ItemTracker from '@/model/ItemTracker';
+import { getFavoriteTrackers, getNotifications, getTrackerStats } from '@/services/statsService';
 
 
-const trackerStats = statsService.getTrackerStats();
-const favoritedTrackers = statsService.getFavoriteTrackers();
+const trackerStats = getTrackerStats();
+const favoritedTrackers = getFavoriteTrackers();
 
 const itemTrackerResponses: { data: {
     isPending: boolean;
@@ -21,7 +20,7 @@ const itemTrackerResponses: { data: {
 
 const favoritedIsLoading = computed(() => favoritedTrackers.isPending || favoritedTrackers.isError);
 
-const notificationsResponse = statsService.getNotifications();
+const notificationsResponse = getNotifications();
 
 const scope = getCurrentScope();
 const app = getCurrentInstance();
