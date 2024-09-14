@@ -4,6 +4,10 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-rocket = "0.5.1"
-rocket_db_pools = { version = "0.2.0", features = ["sqlx_sqlite"] }
-sqlx = { version = "0.7.4", default-features = false, features = ["macros", "migrate"] }
+rocket = { version = "0.5.1", features = ["json"] }
+rocket_db_pools = { version = "0.2.0", features = ["sqlx_postgres"] }
+sqlx = { version = "0.7.4", default-features = false, features = [
+    "macros",
+    "migrate",
+    "postgres",
+] }

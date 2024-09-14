@@ -1,2 +1,2 @@
-[default.databases.sqlite_logs]
-url = "/path/to/database.sqlite"
+[default.databases.db]
+url = "postgresql://postgres:samuel11@r.pi:5432/oculite"
