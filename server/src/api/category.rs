@@ -27,20 +27,20 @@ pub async fn all(db: Connection<Db>) -> (Status, Json<CategoryResponse>) {
 pub async fn add(db: Connection<Db>, category: Json<Category>) -> (Status, &'static str) {
     match persist::category::add(db, category.clone().into_inner()).await {
         Ok(_) => {
-            info!("Category '{}' added @ {}", category.name, category.url);
+            info!("Category '{}' added @ {}", category.category, category.url);
             (Status::Created, "Category added")
         }
         Err(x) => {
             match &x {
                 sqlx::Error::Database(db_err) => {
                     if db_err.is_unique_violation() {
-                        error!("Category '{}' already exists: {}", category.name, x);
+                        error!("Category '{}' already exists: {}", category.category, x);
                         return (Status::Conflict, "Category already exists");
                     }
                 }
                 _ => {}
             }
-            error!("Failed to add category '{}': {}", category.name, x);
+            error!("Failed to add category '{}': {}", category.category, x);
             (Status::InternalServerError, "Failed to add category")
         }
     }

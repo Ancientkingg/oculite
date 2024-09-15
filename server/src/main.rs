@@ -4,8 +4,9 @@ use rocket_db_pools::Database;
 #[macro_use]
 extern crate rocket;
 
-mod api;
+mod services;
 mod persist;
+mod api;
 
 #[launch]
 fn rocket() -> _ {
