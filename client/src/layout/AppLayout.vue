@@ -4,6 +4,7 @@ import AppTopbar from './AppTopbar.vue';
 import AppFooter from './AppFooter.vue';
 import AppSidebar from './AppSidebar.vue';
 import { useLayout } from '@/layout/composables/layout';
+import { useRoute } from 'vue-router';
 
 const { layoutConfig, layoutState, isSidebarActive } = useLayout();
 
@@ -53,6 +54,16 @@ const isOutsideClicked = (event) => {
 
     return !(sidebarEl.isSameNode(event.target) || sidebarEl.contains(event.target) || topbarEl.isSameNode(event.target) || topbarEl.contains(event.target));
 };
+
+const route = useRoute();
+const showCategoryConfig = computed(() => route.path.startsWith('/category/'));
+const categoryId = computed(() => {
+    if (showCategoryConfig.value) {
+        return Number(route.path.split('/category/')[1]);
+    }
+    return -1;
+});
+
 </script>
 
 <template>
@@ -60,7 +71,12 @@ const isOutsideClicked = (event) => {
         class="layout-wrapper"
         :class="containerClass"
         >
-        <app-topbar />
+        <Suspense>
+            <app-topbar
+                :showCategoryConfig="showCategoryConfig"
+                :categoryId="categoryId"
+                />
+        </Suspense>
         <div class="layout-sidebar">
             <app-sidebar />
         </div>

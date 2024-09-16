@@ -3,9 +3,15 @@ import { ref, computed, onMounted, onBeforeUnmount, Ref } from 'vue';
 import { useLayout } from '@/layout/composables/layout';
 import { showToast } from '@/layout/composables/toast';
 import { useToast } from 'primevue/usetoast';
-import { addCategory } from '@/services/categoryService';
-
+import { addCategory, getCategoryConfig, updateCategoryConfig } from '@/services/categoryService';
 const { layoutConfig, onMenuToggle } = useLayout();
+
+interface Props {
+    showCategoryConfig: boolean;
+    categoryId: number;
+}
+
+const props = defineProps<Props>();
 
 const outsideClickListener: Ref = ref(null);
 const topbarMenuActive: Ref<boolean> = ref(false);
@@ -34,25 +40,44 @@ const topbarMenuClasses = computed(() => {
 
 const categoryName = ref('');
 const categoryUrl = ref('');
-const display = ref(false);
 
-const open = () => {
-    display.value = true;
+const categoryConfig = ref('');
+
+if (props.showCategoryConfig) {
+    getCategoryConfig(props.categoryId).catch(() => '').then((x) => {
+        categoryConfig.value = x;
+    })
+}
+
+const displayAddCategory = ref(false);
+const displayCategoryConfig = ref(false);
+
+const openAddCategory = () => {
+    displayAddCategory.value = true;
 };
+
+const openCategoryConfig = () => {
+    displayCategoryConfig.value = true;
+}
 
 const toast = useToast();
 
-const cancel = () => {
-    display.value = false;
+const cancelAddCategory = () => {
+    displayAddCategory.value = false;
     showToast(toast, 'error', 'Cancelled', 'Category addition cancelled', 1000);
 };
 
-const confirm = async () => {
+const cancelCategoryConfig = () => {
+    displayCategoryConfig.value = false;
+    showToast(toast, 'error', 'Cancelled', 'Category Config edit cancelled', 1000);
+};
+
+const confirmAddCategory = async () => {
     if (categoryName.value === '' || categoryUrl.value === '') return;
 
     const responseStatus = await addCategory(categoryName.value, categoryUrl.value);
 
-    display.value = false;
+    displayAddCategory.value = false;
 
     if (responseStatus === 200) {
         showToast(toast, 'success', 'Success', 'Category added successfully', 1000);
@@ -60,6 +85,18 @@ const confirm = async () => {
         showToast(toast, 'error', 'Error', 'Could not add category', 1000);
     }
 };
+
+const confirmCategoryConfig = async () => {
+    const responseStatus = await updateCategoryConfig(props.categoryId, categoryConfig.value);
+
+    displayCategoryConfig.value = false;
+
+    if (responseStatus === 200) {
+        showToast(toast, 'success', 'Success', 'Category config updated successfully', 1000);
+    } else {
+        showToast(toast, 'error', 'Error', 'Could not update category config', 1000);
+    }
+}
 
 const bindOutsideClickListener = () => {
     if (!outsideClickListener.value) {
@@ -119,14 +156,22 @@ const isOutsideClicked = (event) => {
             :class="topbarMenuClasses"
             >
             <button
+                v-if="props.showCategoryConfig"
                 class="p-link layout-topbar-button"
-                @click="open"
+                @click="openCategoryConfig"
+                >
+                <i class="pi pi-file-edit" />
+                <span>Edit Category Config</span>
+            </button>
+            <button
+                class="p-link layout-topbar-button"
+                @click="openAddCategory"
                 >
                 <i class="pi pi-plus" />
                 <span>Add Category</span>
             </button>
             <Dialog
-                v-model:visible="display"
+                v-model:visible="displayAddCategory"
                 header="Add Category"
                 :breakpoints="{ '960px': '75vw' }"
                 :style="{ width: '30vw' }"
@@ -163,13 +208,50 @@ const isOutsideClicked = (event) => {
                         label="Cancel"
                         icon="pi pi-times"
                         class="p-button-outlined"
-                        @click="cancel"
+                        @click="cancelAddCategory"
                         />
                     <Button
                         label="Confirm"
                         icon="pi pi-check"
                         class="p-button-outlined"
-                        @click="confirm"
+                        @click="confirmAddCategory"
+                        />
+                </template>
+            </Dialog>
+            <Dialog
+                v-if="props.showCategoryConfig"
+                v-model:visible="displayCategoryConfig"
+                header="Edit Category Config"
+                :breakpoints="{ '960px': '75vw' }"
+                :style="{ width: '30vw' }"
+                :modal="true"
+                :dismissableMask="true"
+                :draggable="false"
+                >
+                <div class="p-fluid field pt-4">
+                    <FloatLabel>
+                        <Textarea
+                            id="category-config"
+                            v-model="categoryConfig"
+                            autoResize
+                            rows="12"
+                            cols="30"
+                            />
+                        <!-- <label for="category-config">Category Config</label> -->
+                    </FloatLabel>
+                </div>
+                <template #footer>
+                    <Button
+                        label="Cancel"
+                        icon="pi pi-times"
+                        class="p-button-outlined"
+                        @click="cancelCategoryConfig"
+                        />
+                    <Button
+                        label="Confirm"
+                        icon="pi pi-check"
+                        class="p-button-outlined"
+                        @click="confirmCategoryConfig"
                         />
                 </template>
             </Dialog>

@@ -18,7 +18,7 @@ pub async fn all(db: Connection<Db>) -> (Status, Json<ItemTrackerResponse>) {
         Ok(it_ids) => {
             info!("All item trackers: {:?}", it_ids);
 
-            let active_it_ids: Vec<ItemTrackerId> = filter_inactive_categories(it_ids).await.into_iter().map(|(id, _)| id).collect();
+            let active_it_ids: Vec<ItemTrackerId> = filter_inactive_categories(it_ids).await;
 
             (Status::Ok, Json(ItemTrackerResponse::Data(active_it_ids)))
         }
