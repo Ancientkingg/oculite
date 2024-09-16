@@ -19,8 +19,6 @@ export async function fetchAllCategories(queryClient: QueryClient) {
 }
 
 async function fetchCategories(): Promise<Category[]> {
-    return [new Category(0, 'blabla')];
-
     return fetch(import.meta.env.VITE_API_BASE_URL + 'category', {
         method: 'GET',
     })
