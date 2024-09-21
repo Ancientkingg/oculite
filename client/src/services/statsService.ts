@@ -23,16 +23,16 @@ export function getTrackerStats() {
 }
 
 async function fetchTrackerStats(): Promise<TrackerStats> {
-    return fetch(import.meta.env.VITE_API_BASE_URL + 'trackers', {
+    return fetch(import.meta.env.VITE_API_BASE_URL + 'stats', {
         method: 'GET',
     })
         .then((res) => res.json())
         .then((data) => {
             return {
-                total: data.total,
-                rising: data.rising,
-                falling: data.falling,
-                stale: data.stale,
+                total: data.Data.total,
+                rising: data.Data.rising,
+                falling: data.Data.falling,
+                stale: data.Data.stale,
             };
         });
 }
@@ -47,7 +47,7 @@ export function getNotifications() {
 }
 
 async function fetchNotifications(): Promise<Notification[]> {
-    return fetch(import.meta.env.VITE_API_BASE_URL + 'notifications', {
+    return fetch(import.meta.env.VITE_API_BASE_URL + 'stats/notifications', {
         method: 'GET',
     })
         .then((res) => res.json())
@@ -71,7 +71,7 @@ export function getFavoriteTrackers() {
 }
 
 async function fetchFavoriteTrackers(): Promise<number[]> {
-    return fetch(import.meta.env.VITE_API_BASE_URL + 'favorite-trackers', {
+    return fetch(import.meta.env.VITE_API_BASE_URL + 'stats/favorite', {
         method: 'GET',
     })
         .then((res) => res.json())
