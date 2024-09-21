@@ -1,4 +1,4 @@
-use crate::persist::{self, category::Category, Db};
+use crate::persist::{self, category::Category, itemtracker::ItemTrackerId, Db};
 use rocket::{
     http::Status,
     serde::{json::Json, Deserialize, Serialize},
@@ -6,14 +6,12 @@ use rocket::{
 use rocket_db_pools::Connection;
 
 #[derive(Serialize)]
-#[serde(crate = "rocket::serde")]
 pub struct CategoryOpaque {
     pub id: i32,
     pub name: String,
 }
 
 #[derive(Serialize, Deserialize, Clone)]
-#[serde(crate = "rocket::serde")]
 pub struct CategoryRequest {
     pub name: Option<String>,
     pub url: Option<String>,
@@ -32,14 +30,12 @@ impl From<CategoryRequest> for Category {
 }
 
 #[derive(Serialize)]
-#[serde(crate = "rocket::serde")]
 pub enum CategoryResponse {
     Data(Vec<CategoryOpaque>),
     Error(&'static str),
 }
 
 #[derive(Serialize)]
-#[serde(crate = "rocket::serde")]
 pub enum SingleCategoryResponse {
     Data(CategoryRequest),
     Error(&'static str),
@@ -158,5 +154,33 @@ pub async fn update(
                 (Status::InternalServerError, "Failed to update category")
             }
         },
+    }
+}
+
+#[derive(Serialize)]
+pub enum ItemTrackerPerCategoryResponse {
+    Data(Vec<ItemTrackerId>),
+    Error(&'static str),
+}
+
+#[get("/<category_id>/it")]
+pub async fn get_itemtrackers(
+    db: Connection<Db>,
+    category_id: i32,
+) -> (Status, Json<ItemTrackerPerCategoryResponse>) {
+    match persist::itemtracker::get_ids_by_category(db, category_id).await {
+        Ok(it) => {
+            info!("Item trackers found for category {}", category_id);
+            (Status::Ok, Json(ItemTrackerPerCategoryResponse::Data(it)))
+        }
+        Err(x) => {
+            error!("Failed to get item trackers: {}", x);
+            (
+                Status::NotFound,
+                Json(ItemTrackerPerCategoryResponse::Error(
+                    "Failed to get category",
+                )),
+            )
+        }
     }
 }

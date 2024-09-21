@@ -13,3 +13,4 @@ sqlx = { version = "0.7.4", default-features = false, features = [
     "migrate",
     "postgres",
 ] }
+serde = { version = "1.0.210", features = ["derive"] }

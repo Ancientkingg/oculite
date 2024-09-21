@@ -1,16 +1,25 @@
-use rocket::{http::Status, serde::{json::Json, Serialize}};
+use rocket::{
+    http::Status,
+    serde::{json::Json, Serialize},
+};
 use rocket_db_pools::Connection;
 
-use crate::{persist::{self, itemtracker::ItemTrackerId, Db}, services::category::filter_inactive_categories};
-
+use crate::{
+    persist::{self, itemtracker::ItemTrackerId, Db},
+    services::category::filter_inactive_categories,
+};
 
 #[derive(Serialize)]
-#[serde(crate = "rocket::serde")]
 pub enum ItemTrackerResponse {
     Data(Vec<ItemTrackerId>),
     Error(&'static str),
 }
 
+#[derive(Serialize)]
+pub enum SingleItemTrackerResponse {
+    Data(ItemTrackerId),
+    Error(&'static str),
+}
 
 #[get("/")]
 pub async fn all(db: Connection<Db>) -> (Status, Json<ItemTrackerResponse>) {
@@ -24,7 +33,19 @@ pub async fn all(db: Connection<Db>) -> (Status, Json<ItemTrackerResponse>) {
         }
         Err(x) => {
             error!("Failed to get item tracker ids: {}", x);
-            (Status::InternalServerError, Json(ItemTrackerResponse::Error("Failed to get categories")))
+            (
+                Status::InternalServerError,
+                Json(ItemTrackerResponse::Error("Failed to get categories")),
+            )
         }
     }
 }
+
+#[get("/<id>")]
+pub async fn get(db: Connection<Db>, id: i32) -> (Status, Json<SingleItemTrackerResponse>) {}
+
+#[put("/<id>/favorite")]
+pub async fn favorite(db: Connection<Db>, id: i32) -> (Status, Json<SingleItemTrackerResponse>) {}
+
+#[put("/<id>/unfavorite")]
+pub async fn unfavorite(db: Connection<Db>, id: i32) -> (Status, Json<SingleItemTrackerResponse>) {}

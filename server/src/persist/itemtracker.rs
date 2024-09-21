@@ -9,7 +9,6 @@ use super::{
 pub type ItemTrackerId = i32;
 
 #[derive(sqlx::FromRow, Serialize, Deserialize, Clone, Debug)]
-#[serde(crate = "rocket::serde")]
 pub struct ItemTracker {
     pub category: Category,
 
@@ -87,4 +86,19 @@ pub async fn add(mut db: Connection<Db>, category: Category) -> Result<Category,
     )
     .fetch_one(&mut **db)
     .await
+}
+
+pub async fn get_ids_by_category(
+    mut db: Connection<Db>,
+    category_id: i32,
+) -> Result<Vec<ItemTrackerId>, sqlx::Error> {
+    let item_tracker_ids = sqlx::query!(
+        "SELECT id FROM item_trackers JOIN categories USING (category_id) WHERE category_id = $1",
+        category_id
+    )
+    .map(|row| row.id)
+    .fetch_all(&mut **db)
+    .await;
+
+    return item_tracker_ids;
 }

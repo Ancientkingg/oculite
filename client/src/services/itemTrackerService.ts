@@ -22,7 +22,7 @@ export function getItemTracker(id: number) {
 }
 
 async function fetchItemTracker(id: number): Promise<ItemTracker> {
-    return fetch(import.meta.env.VITE_API_BASE_URL + `item-trackers/${id}`, {
+    return fetch(import.meta.env.VITE_API_BASE_URL + `it/${id}`, {
         method: 'GET',
     })
         .then((res) => res.json())
@@ -41,23 +41,27 @@ async function fetchItemTracker(id: number): Promise<ItemTracker> {
 
 async function fetchAllItemTrackerIds(categoryId: number): Promise<number[]> {
     return fetch(
-        import.meta.env.VITE_API_BASE_URL + `item-trackers/${categoryId}`,
+        import.meta.env.VITE_API_BASE_URL + `category/${categoryId}}/it`,
         {
             method: 'GET',
         },
     )
         .then((res) => res.json())
-        .then((data) => data.ids);
+        .then((data) => data.Data);
 }
 
 export function favorite(item: ItemTracker) {
     const queryClient = useQueryClient();
     const favoriteMutation = useMutation({
         mutationFn: (itemTrackerId: number) =>
-            fetch(import.meta.env.VITE_API_BASE_URL + 'favorite', {
-                method: 'PUT',
-                body: JSON.stringify({ itemTrackerId }),
-            }).then((res) => res.json()),
+            fetch(
+                import.meta.env.VITE_API_BASE_URL +
+                    `it/${itemTrackerId}/` +
+                    'favorite',
+                {
+                    method: 'PUT',
+                },
+            ).then((res) => res.json()),
 
         onSuccess: (itemTrackerId: number) => {
             queryClient.invalidateQueries({
@@ -73,10 +77,14 @@ export function unfavorite(item: ItemTracker) {
     const queryClient = useQueryClient();
     const unFavoriteMutation = useMutation({
         mutationFn: (itemTrackerId: number) =>
-            fetch(import.meta.env.VITE_API_BASE_URL + 'unfavorite', {
-                method: 'PUT',
-                body: JSON.stringify({ itemTrackerId }),
-            }).then((res) => res.json()),
+            fetch(
+                import.meta.env.VITE_API_BASE_URL +
+                    `it/${itemTrackerId}/` +
+                    'unfavorite',
+                {
+                    method: 'PUT',
+                },
+            ).then((res) => res.json()),
         onSuccess: (itemTrackerId: number) => {
             queryClient.invalidateQueries({
                 queryKey: ['item-tracker', itemTrackerId],

@@ -5,7 +5,6 @@ use std::{fmt::{self, Display, Formatter}, hash::{Hash, Hasher}};
 use super::Db;
 
 #[derive(sqlx::FromRow, Serialize, Deserialize, Clone, Debug)]
-#[serde(crate = "rocket::serde")]
 pub struct Category {
     pub category_id: i32,
     pub category_name: String,
