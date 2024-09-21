@@ -43,6 +43,7 @@ pub async fn all_ids(
     return item_tracker_ids;
 }
 
+#[allow(dead_code)]
 pub async fn get_by_id(
     mut db: Connection<Db>,
     id: ItemTrackerId,

@@ -39,6 +39,7 @@ pub async fn all(mut db: Connection<Db>) -> Result<Vec<Category>, sqlx::Error> {
         .await
 }
 
+#[allow(dead_code)]
 pub async fn get_by_name(mut db: Connection<Db>, name: String) -> Result<Category, sqlx::Error> {
     sqlx::query_as!(
         Category,
@@ -67,6 +68,19 @@ pub async fn add(mut db: Connection<Db>, category: Category) -> Result<Category,
         category.category_name,
         category.config,
         category.url,
+    )
+    .fetch_one(&mut **db)
+    .await
+}
+
+pub async fn update(mut db: Connection<Db>, category_id: i32, category_name: Option<String>, config: Option<String>, url: Option<String>) -> Result<Category, sqlx::Error> {
+    sqlx::query_as!(
+        Category,
+        "UPDATE categories SET category_name = $2, config = $3, url = $4 WHERE category_id = $1 RETURNING *",
+        category_id,
+        category_name,
+        config,
+        url,
     )
     .fetch_one(&mut **db)
     .await
