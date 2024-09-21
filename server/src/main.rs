@@ -19,4 +19,5 @@ fn rocket() -> _ {
         .mount("/", routes![api::index])
         .mount("/category", api::category::routes())
         .mount("/itemtracker", api::itemtracker::routes())
+        .mount("/stats", api::stats::routes())
 }

@@ -7,6 +7,7 @@ pub struct Db(sqlx::PgPool);
 
 pub mod category;
 pub mod itemtracker;
+pub mod stats;
 
 pub async fn run_migrations(rocket: Rocket<Build>) -> fairing::Result {
     match Db::fetch(&rocket) {

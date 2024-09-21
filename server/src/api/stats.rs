@@ -1,18 +1,45 @@
 use rocket::serde::Serialize;
 use rocket::{http::Status, serde::json::Json};
 use rocket_db_pools::Connection;
+use sqlx::Acquire;
 
-use crate::persist::Db;
+use crate::persist::{self, Db};
+
+type Result<T, E = rocket::response::Debug<sqlx::Error>> = std::result::Result<T, E>;
 
 #[derive(Serialize)]
 pub enum StatsResponse {
-    Data { total: i32, unread: i32, read: i32 },
+    Data {
+        total: i64,
+        rising: i64,
+        falling: i64,
+        stale: i64,
+    },
     Error(&'static str),
 }
 
 #[get("/")]
-pub async fn get_stats(db: Connection<Db>) -> (Status, Json<StatsResponse>) {
-    todo!("Implement get_stats")
+pub async fn get_stats(mut db: Connection<Db>) -> Result<(Status, Json<StatsResponse>)> {
+    let total = persist::stats::get_total_trackers(db.acquire().await?).await;
+    let rising = persist::stats::get_rising_trackers(db.acquire().await?).await;
+    let falling = persist::stats::get_falling_trackers(db.acquire().await?).await;
+    let stale = persist::stats::get_stale_trackers(db.acquire().await?).await;
+
+    match (total, rising, falling, stale) {
+        (Ok(total), Ok(rising), Ok(falling), Ok(stale)) => Ok((
+            Status::Ok,
+            Json(StatsResponse::Data {
+                total,
+                rising,
+                falling,
+                stale,
+            }),
+        )),
+        _ => Ok((
+            Status::InternalServerError,
+            Json(StatsResponse::Error("Failed to get stats")),
+        )),
+    }
 }
 
 #[derive(Serialize)]
