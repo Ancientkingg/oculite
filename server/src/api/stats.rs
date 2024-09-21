@@ -1,9 +1,9 @@
 use rocket::serde::Serialize;
 use rocket::tokio::join;
 use rocket::{http::Status, serde::json::Json};
-use rocket_db_pools::Connection;
 
 use crate::persist::itemtracker::ItemTrackerId;
+use crate::persist::notification::Notification;
 use crate::persist::{self, Db};
 
 type Result<T, E = rocket::response::Debug<sqlx::Error>> = std::result::Result<T, E>;
@@ -47,13 +47,19 @@ pub async fn get_stats(db: &Db) -> Result<(Status, Json<StatsResponse>)> {
 
 #[derive(Serialize)]
 pub enum NotificationsResponse {
-    Data(Vec<String>),
+    Data(Vec<Notification>),
     Error(&'static str),
 }
 
 #[get("/notifications")]
 pub async fn get_notifications(db: &Db) -> (Status, Json<NotificationsResponse>) {
-    todo!("Implement get_notifications")
+    match persist::notification::get_all(db).await {
+        Ok(notifications) => (Status::Ok, Json(NotificationsResponse::Data(notifications))),
+        Err(_) => (
+            Status::InternalServerError,
+            Json(NotificationsResponse::Error("Failed to get notifications")),
+        ),
+    }
 }
 
 #[derive(Serialize)]
