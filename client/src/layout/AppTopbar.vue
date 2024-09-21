@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onBeforeUnmount, Ref } from 'vue';
+import { ref, computed, onMounted, onBeforeUnmount, Ref, getCurrentScope, getCurrentInstance } from 'vue';
 import { useLayout } from '@/layout/composables/layout';
 import { showToast } from '@/layout/composables/toast';
 import { useToast } from 'primevue/usetoast';
 import { addCategory, getCategoryConfig, updateCategoryConfig } from '@/services/categoryService';
+import { useQueryClient } from '@tanstack/vue-query';
 const { layoutConfig, onMenuToggle } = useLayout();
 
 interface Props {
@@ -72,6 +73,9 @@ const cancelCategoryConfig = () => {
     showToast(toast, 'error', 'Cancelled', 'Category Config edit cancelled', 1000);
 };
 
+const scope = getCurrentScope();
+const app = getCurrentInstance();
+
 const confirmAddCategory = async () => {
     if (categoryName.value === '' || categoryUrl.value === '') return;
 
@@ -79,7 +83,17 @@ const confirmAddCategory = async () => {
 
     displayAddCategory.value = false;
 
-    if (responseStatus === 200) {
+    if (responseStatus >= 200 && responseStatus < 300) {
+        scope?.run(() => {
+            app?.appContext.app.runWithContext(() => {
+                const queryClient = useQueryClient();
+                queryClient.invalidateQueries({
+                    queryKey: ['categories'],
+                });
+            })
+        })
+        categoryName.value = '';
+        categoryUrl.value = '';
         showToast(toast, 'success', 'Success', 'Category added successfully', 1000);
     } else {
         showToast(toast, 'error', 'Error', 'Could not add category', 1000);
@@ -91,7 +105,7 @@ const confirmCategoryConfig = async () => {
 
     displayCategoryConfig.value = false;
 
-    if (responseStatus === 200) {
+    if (responseStatus >= 200 && responseStatus < 300) {
         showToast(toast, 'success', 'Success', 'Category config updated successfully', 1000);
     } else {
         showToast(toast, 'error', 'Error', 'Could not update category config', 1000);

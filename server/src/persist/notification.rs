@@ -28,7 +28,7 @@ pub async fn add(
 ) -> Result<(), sqlx::Error> {
     sqlx::query!(
         "INSERT INTO notifications (id, message, icon, color, date) VALUES ($1, $2, $3, $4, $5)",
-        rand::random::<i32>(),
+        rand::random::<u16>() as i32,
         message,
         icon,
         color,

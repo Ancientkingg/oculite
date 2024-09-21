@@ -41,7 +41,7 @@ async function fetchItemTracker(id: number): Promise<ItemTracker> {
 
 async function fetchAllItemTrackerIds(categoryId: number): Promise<number[]> {
     return fetch(
-        import.meta.env.VITE_API_BASE_URL + `category/${categoryId}}/it`,
+        import.meta.env.VITE_API_BASE_URL + `category/${categoryId}/it`,
         {
             method: 'GET',
         },

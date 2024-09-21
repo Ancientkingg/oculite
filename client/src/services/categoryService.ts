@@ -1,11 +1,25 @@
 import Category from '@/model/Category';
 import { QueryClient, useQuery } from '@tanstack/vue-query';
-import { reactive } from 'vue';
+import { reactive, watch } from 'vue';
+import router from '@/router';
+import CategoryComponent from '@/views/pages/Category.vue';
 
 export function getAllCategories() {
     const { isPending, isError, data, error } = useQuery({
         queryKey: ['categories'],
         queryFn: fetchCategories,
+    });
+
+    watch(data, () => {
+        const newCategories = data.value?.map((category) => ({
+            path: `/category/${category.getId()}`,
+            name: category.getName(),
+            component: CategoryComponent,
+            props: { category },
+        }));
+
+        if (newCategories)
+            newCategories.forEach((c) => router.addRoute('main', c));
     });
 
     return reactive({ isPending, isError, data, error });
@@ -23,7 +37,12 @@ async function fetchCategories(): Promise<Category[]> {
         method: 'GET',
     })
         .then((res) => res.json())
-        .then((data) => data.Data);
+        .then((data) =>
+            data.Data.map(
+                (category: { id: number; name: string }) =>
+                    new Category(category.id, category.name),
+            ),
+        );
 }
 
 export async function addCategory(

@@ -21,7 +21,7 @@ pub struct CategoryRequest {
 impl From<CategoryRequest> for Category {
     fn from(req: CategoryRequest) -> Self {
         Category {
-            category_id: rand::random::<i32>(),
+            category_id: rand::random::<u16>() as i32,
             category_name: req.name.or(Some("".to_string())).unwrap(),
             config: req.config,
             url: req.url.or(Some("".to_string())).unwrap(),
