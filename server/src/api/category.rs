@@ -124,7 +124,10 @@ pub async fn get(db: Connection<Db>, category_id: i32) -> (Status, Json<SingleCa
         }
         Err(x) => {
             error!("Failed to get category: {}", x);
-            (Status::NotFound, Json(SingleCategoryResponse::Error("Failed to get category")))
+            (
+                Status::NotFound,
+                Json(SingleCategoryResponse::Error("Failed to get category")),
+            )
         }
     }
 }
@@ -141,13 +144,19 @@ pub async fn update(
             info!("Category {} updated @ {}", category, category.url);
             (Status::Ok, "Category updated")
         }
-        Err(x) => {
-            error!(
-                "Failed to update category {}: {}",
-                Into::<Category>::into(category.0),
-                x
-            );
-            (Status::InternalServerError, "Failed to update category")
-        }
+        Err(x) => match x {
+            sqlx::error::Error::RowNotFound => {
+                error!("Category {} not found: {}", category_id, x);
+                return (Status::NotFound, "Category not found");
+            }
+            _ => {
+                error!(
+                    "Failed to update category {}: {}",
+                    Into::<Category>::into(category.0),
+                    x
+                );
+                (Status::InternalServerError, "Failed to update category")
+            }
+        },
     }
 }
