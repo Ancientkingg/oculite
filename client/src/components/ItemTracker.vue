@@ -1,7 +1,8 @@
 <script lang="ts" setup>
-import { reactive, ref, computed, watch } from 'vue';
+import { reactive, ref, computed, watch, getCurrentScope, getCurrentInstance } from 'vue';
 import { useLayout } from '@/layout/composables/layout';
 import ItemTracker from '@/model/ItemTracker';
+import { favorite as favoriteApi, unfavorite as unfavoriteApi } from '@/services/itemTrackerService'
 
 
 const { layoutConfig } = useLayout();
@@ -96,10 +97,19 @@ const triggerOverlay = (e) => {
     overlayPanelTrigger.value.toggle(e);
 }
 
-const favorite = () => {
-    model.value!.isFavorite()
+const scope = getCurrentScope();
+const app = getCurrentInstance();
 
-    // TODO: send favorite status to the server
+const favorite = () => {
+    scope?.run(() => {
+        app?.appContext.app.runWithContext(() => {
+            if (model.value!.isFavorite()) {
+                favoriteApi(model.value!)
+            } else {
+                unfavoriteApi(model.value!)
+            }
+        })
+    })
 }
 </script>
 

@@ -92,8 +92,10 @@ const confirmAddCategory = async () => {
                 });
             })
         })
+
         categoryName.value = '';
         categoryUrl.value = '';
+
         showToast(toast, 'success', 'Success', 'Category added successfully', 1000);
     } else {
         showToast(toast, 'error', 'Error', 'Could not add category', 1000);
