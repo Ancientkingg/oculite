@@ -1,7 +1,7 @@
 use rocket::serde::Serialize;
+use rocket::tokio::join;
 use rocket::{http::Status, serde::json::Json};
 use rocket_db_pools::Connection;
-use sqlx::Acquire;
 
 use crate::persist::{self, Db};
 
@@ -19,11 +19,13 @@ pub enum StatsResponse {
 }
 
 #[get("/")]
-pub async fn get_stats(mut db: Connection<Db>) -> Result<(Status, Json<StatsResponse>)> {
-    let total = persist::stats::get_total_trackers(db.acquire().await?).await;
-    let rising = persist::stats::get_rising_trackers(db.acquire().await?).await;
-    let falling = persist::stats::get_falling_trackers(db.acquire().await?).await;
-    let stale = persist::stats::get_stale_trackers(db.acquire().await?).await;
+pub async fn get_stats(db: &Db) -> Result<(Status, Json<StatsResponse>)> {
+    let total = persist::stats::get_total_trackers(db);
+    let rising = persist::stats::get_rising_trackers(db);
+    let falling = persist::stats::get_falling_trackers(db);
+    let stale = persist::stats::get_stale_trackers(db);
+
+    let (total, rising, falling, stale) = join!(total, rising, falling, stale);
 
     match (total, rising, falling, stale) {
         (Ok(total), Ok(rising), Ok(falling), Ok(stale)) => Ok((

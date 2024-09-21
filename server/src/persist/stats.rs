@@ -1,11 +1,8 @@
-use rocket_db_pools::Connection;
-use sqlx::PgConnection;
-
 use super::Db;
 
-pub async fn get_total_trackers(db: &mut PgConnection) -> Result<i64, sqlx::Error> {
+pub async fn get_total_trackers(db: &Db) -> Result<i64, sqlx::Error> {
     let row = sqlx::query_scalar!("SELECT COUNT(*) FROM item_trackers")
-        .fetch_one(db)  // Mutable dereference
+        .fetch_one(&(*db).0)  // Mutable dereference
         .await?;
 
     match row {
@@ -14,7 +11,7 @@ pub async fn get_total_trackers(db: &mut PgConnection) -> Result<i64, sqlx::Erro
     }
 }
 
-pub async fn get_rising_trackers(db: &mut PgConnection) -> Result<i64, sqlx::Error> {
+pub async fn get_rising_trackers(db: &Db) -> Result<i64, sqlx::Error> {
     let row = sqlx::query_scalar!(
         "WITH latest_prices AS (
             SELECT
@@ -32,7 +29,7 @@ pub async fn get_rising_trackers(db: &mut PgConnection) -> Result<i64, sqlx::Err
         WHERE
             latest_price > second_latest_price"
     )
-    .fetch_one(db)
+    .fetch_one(&(*db).0)
     .await?;
 
     match row {
@@ -41,7 +38,7 @@ pub async fn get_rising_trackers(db: &mut PgConnection) -> Result<i64, sqlx::Err
     }
 }
 
-pub async fn get_falling_trackers(db: &mut PgConnection) -> Result<i64, sqlx::Error> {
+pub async fn get_falling_trackers(db: &Db) -> Result<i64, sqlx::Error> {
     let row = sqlx::query_scalar!(
         "WITH latest_prices AS (
             SELECT
@@ -59,7 +56,7 @@ pub async fn get_falling_trackers(db: &mut PgConnection) -> Result<i64, sqlx::Er
         WHERE
             latest_price < second_latest_price"
     )
-    .fetch_one(db)
+    .fetch_one(&(*db).0)
     .await?;
 
     match row {
@@ -68,7 +65,7 @@ pub async fn get_falling_trackers(db: &mut PgConnection) -> Result<i64, sqlx::Er
     }
 }
 
-pub async fn get_stale_trackers(db: &mut PgConnection) -> Result<i64, sqlx::Error> {
+pub async fn get_stale_trackers(db: &Db) -> Result<i64, sqlx::Error> {
     let row = sqlx::query_scalar!(
         "WITH latest_prices AS (
             SELECT
@@ -86,7 +83,7 @@ pub async fn get_stale_trackers(db: &mut PgConnection) -> Result<i64, sqlx::Erro
         WHERE
             ABS(latest_price - second_latest_price) <= (latest_price * 0.02);"
     )
-    .fetch_one(db)
+    .fetch_one(&(*db).0)
     .await?;
 
     match row {
