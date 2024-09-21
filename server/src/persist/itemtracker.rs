@@ -25,12 +25,14 @@ pub async fn all_ids(
     mut db: Connection<Db>,
 ) -> Result<Vec<(ItemTrackerId, Category)>, sqlx::Error> {
     let item_tracker_ids = sqlx::query!(
-        "SELECT id, category, url FROM item_trackers JOIN categories USING (category)"
+        "SELECT id, category_id, url, category_name, config FROM item_trackers JOIN categories USING (category_id)"
     )
     .map(|row| {
         let category = category::Category {
-            category: row.category,
+            category_id: row.category_id,
             url: row.url,
+            category_name: row.category_name,
+            config: row.config,
         };
 
         (row.id, category)
@@ -46,12 +48,14 @@ pub async fn get_by_id(
     id: ItemTrackerId,
 ) -> Result<ItemTracker, sqlx::Error> {
     let item_tracker = sqlx::query!(
-        "SELECT * FROM item_trackers JOIN categories USING (category) WHERE id = $1",
+        "SELECT * FROM item_trackers JOIN categories USING (category_id) WHERE id = $1",
         id
     )
     .map(|row| {
         let category = Category {
-            category: row.category,
+            category_id: row.category_id,
+            category_name: row.category_name,
+            config: row.config,
             url: row.url,
         };
 
@@ -74,8 +78,10 @@ pub async fn get_by_id(
 pub async fn add(mut db: Connection<Db>, category: Category) -> Result<Category, sqlx::Error> {
     sqlx::query_as!(
         Category,
-        "INSERT INTO categories (category, url) VALUES ($1, $2) RETURNING *",
-        category.category,
+        "INSERT INTO categories (category_id, category_name, config, url) VALUES ($1, $2, $3, $4) RETURNING *",
+        category.category_id,
+        category.category_name,
+        category.config,
         category.url
     )
     .fetch_one(&mut **db)

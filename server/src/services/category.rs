@@ -23,11 +23,11 @@ pub async fn filter_inactive_categories(it: Vec<(i32, Category)>) -> Vec<i32> {
                     cached_categories.insert(category.clone(), true);
                     active_it.push(id);
                 } else {
-                    error!("Failed to get category: {}", category.category);
+                    error!("Failed to get category: {}", category);
                     cached_categories.insert(category.clone(), false);
                 }
             } else {
-                error!("Failed to get category: {}", category.category);
+                error!("Failed to get category: {}", category);
             }
         }
     }
