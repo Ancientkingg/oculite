@@ -52,7 +52,7 @@ async function fetchNotifications(): Promise<Notification[]> {
     })
         .then((res) => res.json())
         .then((data) => {
-            return data.data.map((notification: any) => {
+            return data.Data.map((notification: any) => {
                 return {
                     message: notification.message,
                     icon: notification.icon,
@@ -75,5 +75,5 @@ async function fetchFavoriteTrackers(): Promise<number[]> {
         method: 'GET',
     })
         .then((res) => res.json())
-        .then((data) => data.data);
+        .then((data) => data.Data);
 }

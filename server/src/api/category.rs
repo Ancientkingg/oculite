@@ -1,11 +1,21 @@
 use crate::persist::{self, category::Category, Db};
-use rocket::{http::Status, serde::{json::Json, Serialize}};
+use rocket::{
+    http::Status,
+    serde::{json::Json, Serialize},
+};
 use rocket_db_pools::Connection;
 
 #[derive(Serialize)]
 #[serde(crate = "rocket::serde")]
+pub struct CategoryOpaque {
+    pub id: i32,
+    pub name: String,
+}
+
+#[derive(Serialize)]
+#[serde(crate = "rocket::serde")]
 pub enum CategoryResponse {
-    Data(Vec<Category>),
+    Data(Vec<CategoryOpaque>),
     Error(&'static str),
 }
 
@@ -14,11 +24,25 @@ pub async fn all(db: Connection<Db>) -> (Status, Json<CategoryResponse>) {
     match persist::category::all(db).await {
         Ok(categories) => {
             info!("Categories: {:?}", categories);
-            (Status::Ok, Json(CategoryResponse::Data(categories)))
+            (
+                Status::Ok,
+                Json(CategoryResponse::Data(
+                    categories
+                        .into_iter()
+                        .map(|c| CategoryOpaque {
+                            id: c.category_id,
+                            name: c.category_name,
+                        })
+                        .collect(),
+                )),
+            )
         }
         Err(x) => {
             error!("Failed to get categories: {}", x);
-            (Status::InternalServerError, Json(CategoryResponse::Error("Failed to get categories")))
+            (
+                Status::InternalServerError,
+                Json(CategoryResponse::Error("Failed to get categories")),
+            )
         }
     }
 }
@@ -47,6 +71,4 @@ pub async fn add(db: Connection<Db>, category: Json<Category>) -> (Status, &'sta
 }
 
 #[put("/", data = "<category>")]
-pub async fn update(db: Connection<Db>, category: Json<Category>) -> (Status, &'static str) {
-
-}
+pub async fn update(db: Connection<Db>, category: Json<Category>) -> (Status, &'static str) {}
