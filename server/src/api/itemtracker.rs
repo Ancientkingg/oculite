@@ -42,10 +42,62 @@ pub async fn all(db: Connection<Db>) -> (Status, Json<ItemTrackerResponse>) {
 }
 
 #[get("/<id>")]
-pub async fn get(db: Connection<Db>, id: i32) -> (Status, Json<SingleItemTrackerResponse>) {}
+pub async fn get(db: Connection<Db>, id: i32) -> (Status, Json<SingleItemTrackerResponse>) {
+    match persist::itemtracker::get_by_id(db, id).await {
+        Ok(it) => {
+            info!("Item tracker found: {:?}", it);
+            (Status::Ok, Json(SingleItemTrackerResponse::Data(it.id)))
+        }
+        Err(x) => {
+            error!("Failed to get item tracker: {}", x);
+            (
+                Status::NotFound,
+                Json(SingleItemTrackerResponse::Error(
+                    "Failed to get item tracker",
+                )),
+            )
+        }
+    }
+}
 
 #[put("/<id>/favorite")]
-pub async fn favorite(db: Connection<Db>, id: i32) -> (Status, Json<SingleItemTrackerResponse>) {}
+pub async fn favorite(db: Connection<Db>, id: i32) -> (Status, Json<SingleItemTrackerResponse>) {
+    match persist::itemtracker::set_favorite(db, id, true).await {
+        Ok(it) => {
+            info!("Item tracker favorited: {:?}", it);
+            (Status::Ok, Json(SingleItemTrackerResponse::Data(it)))
+        }
+        Err(x) => {
+            error!("Failed to favorite item tracker: {}", x);
+            (
+                Status::InternalServerError,
+                Json(SingleItemTrackerResponse::Error(
+                    "Failed to favorite item tracker",
+                )),
+            )
+        }
+    }
+}
 
 #[put("/<id>/unfavorite")]
-pub async fn unfavorite(db: Connection<Db>, id: i32) -> (Status, Json<SingleItemTrackerResponse>) {}
+pub async fn unfavorite(db: Connection<Db>, id: i32) -> (Status, Json<SingleItemTrackerResponse>) {
+    match persist::itemtracker::set_favorite(db, id, false).await {
+        Ok(it) => {
+            info!("Item tracker unfavorited: {:?}", it);
+            (Status::Ok, Json(SingleItemTrackerResponse::Data(it)))
+        }
+        Err(x) => {
+            error!("Failed to unfavorite item tracker: {}", x);
+            (
+                Status::InternalServerError,
+                Json(SingleItemTrackerResponse::Error(
+                    "Failed to unfavorite item tracker",
+                )),
+            )
+        }
+    }
+}
+
+pub fn routes() -> Vec<rocket::Route> {
+    routes![all, get, favorite, unfavorite]
+}

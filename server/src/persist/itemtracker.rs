@@ -102,3 +102,20 @@ pub async fn get_ids_by_category(
 
     return item_tracker_ids;
 }
+
+pub async fn set_favorite(
+    mut db: Connection<Db>,
+    id: ItemTrackerId,
+    favorite: bool,
+) -> Result<ItemTrackerId, sqlx::Error> {
+    let item_tracker = sqlx::query!(
+        "UPDATE item_trackers SET favorite = $2 WHERE id = $1 RETURNING id",
+        id,
+        favorite
+    )
+    .map(|row| row.id)
+    .fetch_one(&mut **db)
+    .await;
+
+    return item_tracker;
+}

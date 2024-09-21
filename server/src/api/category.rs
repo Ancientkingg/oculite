@@ -184,3 +184,7 @@ pub async fn get_itemtrackers(
         }
     }
 }
+
+pub fn routes() -> Vec<rocket::Route> {
+    routes![all, add, get, update, get_itemtrackers,]
+}

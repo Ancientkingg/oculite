@@ -4,9 +4,9 @@ use rocket_db_pools::Database;
 #[macro_use]
 extern crate rocket;
 
-mod services;
-mod persist;
 mod api;
+mod persist;
+mod services;
 
 #[launch]
 fn rocket() -> _ {
@@ -17,8 +17,6 @@ fn rocket() -> _ {
             persist::run_migrations,
         ))
         .mount("/", routes![api::index])
-        .mount(
-            "/category",
-            routes![api::category::all, api::category::add],
-        )
+        .mount("/category", api::category::routes())
+        .mount("/itemtracker", api::itemtracker::routes())
 }
