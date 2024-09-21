@@ -91,3 +91,11 @@ pub async fn get_stale_trackers(db: &Db) -> Result<i64, sqlx::Error> {
         None => Err(sqlx::Error::RowNotFound),
     }
 }
+
+pub async fn get_ids_of_favorite_trackers(db: &Db) -> Result<Vec<i32>, sqlx::Error> {
+    let rows = sqlx::query_scalar!("SELECT id FROM item_trackers WHERE favorite = true")
+        .fetch_all(&(*db).0)
+        .await?;
+
+    Ok(rows)
+}

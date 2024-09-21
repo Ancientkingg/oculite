@@ -3,6 +3,7 @@ use rocket::tokio::join;
 use rocket::{http::Status, serde::json::Json};
 use rocket_db_pools::Connection;
 
+use crate::persist::itemtracker::ItemTrackerId;
 use crate::persist::{self, Db};
 
 type Result<T, E = rocket::response::Debug<sqlx::Error>> = std::result::Result<T, E>;
@@ -51,19 +52,22 @@ pub enum NotificationsResponse {
 }
 
 #[get("/notifications")]
-pub async fn get_notifications(db: Connection<Db>) -> (Status, Json<NotificationsResponse>) {
+pub async fn get_notifications(db: &Db) -> (Status, Json<NotificationsResponse>) {
     todo!("Implement get_notifications")
 }
 
 #[derive(Serialize)]
 pub enum FavoriteResponse {
-    Data(Vec<String>),
+    Data(Vec<ItemTrackerId>),
     Error(&'static str),
 }
 
 #[get("/favorite")]
-pub async fn get_favorite(db: Connection<Db>) -> (Status, Json<FavoriteResponse>) {
-    todo!("Implement get_favorite")
+pub async fn get_favorite(db: &Db) -> (Status, Json<FavoriteResponse>) {
+    match persist::stats::get_ids_of_favorite_trackers(&db).await {
+        Ok(ids) => (Status::Ok, Json(FavoriteResponse::Data(ids))),
+        Err(_) => (Status::InternalServerError, Json(FavoriteResponse::Error("Failed to get favorite trackers"))),
+    }
 }
 
 pub fn routes() -> Vec<rocket::Route> {

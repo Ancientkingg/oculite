@@ -56,6 +56,8 @@ async function fetchNotifications(): Promise<Notification[]> {
                 return {
                     message: notification.message,
                     icon: notification.icon,
+                    color: notification.color,
+                    date: new Date(notification.date),
                 };
             });
         });
