@@ -62,7 +62,10 @@ pub async fn refresh_all(db: &PgPool) -> Result<(), RefreshError> {
 
     // Get all existing item trackers
     let current_it = persist::itemtracker::all_ids(db).await?;
-    let current_it_ids = current_it.into_iter().map(|(id, _)| id).collect::<HashSet<_>>();
+    let current_it_ids = current_it
+        .into_iter()
+        .map(|(id, _)| id)
+        .collect::<HashSet<_>>();
     let mut active_ids = HashSet::<i32>::new();
 
     // Go through the results
@@ -70,19 +73,21 @@ pub async fn refresh_all(db: &PgPool) -> Result<(), RefreshError> {
         let it = result?;
 
         for item in it {
-            let id = item.id;
+            let id = item.get_id();
             active_ids.insert(id);
+
+            let price_data = item.price_data.clone();
 
             if current_it_ids.contains(&id) {
                 // Update the item tracker
                 persist::itemtracker::update(db, &item).await?;
             } else {
                 // Insert the item tracker
-                persist::itemtracker::insert(db, &item).await?;
+                persist::itemtracker::insert(db, item).await?;
             }
 
             // Update price data
-            match item.price_data {
+            match price_data {
                 Some(price_data) => {
                     for price in price_data {
                         let date = Utc::now();
@@ -113,5 +118,14 @@ pub async fn fetch_category(category: Category) -> Result<Vec<ItemTracker>, reqw
     let resp = reqwest::get(&category.url).await?;
     let it_resp = resp.json::<ItemTrackerResponse>().await?;
 
-    Ok(it_resp.data)
+    Ok(it_resp
+        .data
+        .into_iter()
+        .map(|mut x| {
+            x.category = Some(category.clone());
+            x.id = x.get_id() ^ category.category_id;
+
+            x
+        })
+        .collect())
 }

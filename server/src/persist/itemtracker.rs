@@ -12,7 +12,7 @@ pub type ItemTrackerId = i32;
 
 #[derive(sqlx::FromRow, Serialize, Deserialize, Clone, Debug)]
 pub struct ItemTracker {
-    pub category: Category,
+    pub category: Option<Category>,
 
     pub id: ItemTrackerId,
     pub name: String,
@@ -22,6 +22,12 @@ pub struct ItemTracker {
     pub favorite: Option<bool>,
 
     pub price_data: Option<Vec<f64>>,
+}
+
+impl ItemTracker {
+    pub fn get_id(&self) -> ItemTrackerId {
+        self.id
+    }
 }
 
 pub async fn all_ids(db: &PgPool) -> Result<Vec<(ItemTrackerId, Category)>, sqlx::Error> {
@@ -62,7 +68,7 @@ pub async fn get_by_id(
         };
 
         ItemTracker {
-            category,
+            category: Some(category),
             id: row.id,
             name: row.name,
             currency: row.currency,
@@ -78,16 +84,17 @@ pub async fn get_by_id(
     return item_tracker;
 }
 
-pub async fn insert(db: &PgPool, it: &ItemTracker) -> Result<ItemTrackerId, sqlx::Error> {
+pub async fn insert(db: &PgPool, it: ItemTracker) -> Result<ItemTrackerId, sqlx::Error> {
+    let category_id = it.category.clone().unwrap().category_id;
     sqlx::query_scalar!(
         "INSERT INTO item_trackers (id, name, currency, icon, link, favorite, category_id) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id",
-        it.id,
+        it.get_id(),
         it.name,
         it.currency,
         it.icon,
         it.link,
         it.favorite,
-        it.category.category_id
+        category_id
     )
     .fetch_one(db)
     .await
@@ -96,7 +103,7 @@ pub async fn insert(db: &PgPool, it: &ItemTracker) -> Result<ItemTrackerId, sqlx
 pub async fn update(db: &PgPool, it: &ItemTracker) -> Result<ItemTrackerId, sqlx::Error> {
     sqlx::query_scalar!(
         "UPDATE item_trackers SET name = $2, currency = $3, icon = $4, link = $5, favorite = $6 WHERE id = $1 RETURNING id",
-        it.id,
+        it.get_id(),
         it.name,
         it.currency,
         it.icon,

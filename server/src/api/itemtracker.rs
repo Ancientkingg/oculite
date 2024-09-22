@@ -46,7 +46,7 @@ pub async fn get(db: Connection<Db>, id: i32) -> (Status, Json<SingleItemTracker
     match persist::itemtracker::get_by_id(db, id).await {
         Ok(it) => {
             info!("Item tracker found: {:?}", it);
-            (Status::Ok, Json(SingleItemTrackerResponse::Data(it.id)))
+            (Status::Ok, Json(SingleItemTrackerResponse::Data(it.get_id())))
         }
         Err(x) => {
             error!("Failed to get item tracker: {}", x);
