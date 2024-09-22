@@ -1,5 +1,6 @@
 use chrono::{DateTime, Utc};
 use rocket::serde::{Deserialize, Serialize};
+use sqlx::PgPool;
 
 use super::Db;
 
@@ -21,7 +22,7 @@ pub async fn get_all(db: &Db) -> Result<Vec<Notification>, sqlx::Error> {
 }
 
 pub async fn insert(
-    db: &Db,
+    db: &PgPool,
     message: &str,
     icon: &str,
     color: &str,
@@ -35,7 +36,7 @@ pub async fn insert(
         color,
         date
     )
-    .execute(&(*db).0)
+    .execute(db)
     .await?;
 
     Ok(())
