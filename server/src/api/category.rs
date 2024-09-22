@@ -42,7 +42,7 @@ pub enum SingleCategoryResponse {
 }
 
 #[get("/")]
-pub async fn all(db: Connection<Db>) -> (Status, Json<CategoryResponse>) {
+pub async fn all(db: &Db) -> (Status, Json<CategoryResponse>) {
     match persist::category::all(db).await {
         Ok(categories) => {
             info!("Categories: {:?}", categories);

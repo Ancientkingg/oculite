@@ -22,7 +22,7 @@ pub enum SingleItemTrackerResponse {
 }
 
 #[get("/")]
-pub async fn all(db: Connection<Db>) -> (Status, Json<ItemTrackerResponse>) {
+pub async fn all(db: &Db) -> (Status, Json<ItemTrackerResponse>) {
     match persist::itemtracker::all_ids(db).await {
         Ok(it_ids) => {
             info!("All item trackers: {:?}", it_ids);

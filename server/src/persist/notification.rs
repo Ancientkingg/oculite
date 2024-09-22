@@ -25,6 +25,7 @@ pub async fn add(
     message: &str,
     icon: &str,
     color: &str,
+    date: DateTime<Utc>,
 ) -> Result<(), sqlx::Error> {
     sqlx::query!(
         "INSERT INTO notifications (id, message, icon, color, date) VALUES ($1, $2, $3, $4, $5)",
@@ -32,7 +33,7 @@ pub async fn add(
         message,
         icon,
         color,
-        Utc::now()
+        date
     )
     .execute(&(*db).0)
     .await?;

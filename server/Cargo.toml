@@ -5,7 +5,7 @@ edition = "2021"
 
 [dependencies]
 rand = "0.8.5"
-reqwest = "0.12.7"
+reqwest = { version = "0.12.7", features = ["json"] }
 rocket = { version = "0.5.1", features = ["json"] }
 rocket_db_pools = { version = "0.2.0", features = ["sqlx_postgres"] }
 sqlx = { version = "0.7.4", default-features = false, features = [
@@ -13,7 +13,9 @@ sqlx = { version = "0.7.4", default-features = false, features = [
     "migrate",
     "postgres",
     "chrono",
+    "json",
 ] }
 serde = { version = "1.0.210", features = ["derive"] }
 chrono = { version = "0.4.38", features = ["serde"] }
 rocket_cors = "0.6.0"
+thiserror = "1.0.63"

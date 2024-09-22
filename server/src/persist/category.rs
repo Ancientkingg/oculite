@@ -1,5 +1,6 @@
 use rocket::serde::{Deserialize, Serialize};
 use rocket_db_pools::Connection;
+use sqlx::{Pool, Postgres};
 use std::{fmt::{self, Display, Formatter}, hash::{Hash, Hasher}};
 
 use super::Db;
@@ -32,9 +33,9 @@ impl Display for Category {
     }
 }
 
-pub async fn all(mut db: Connection<Db>) -> Result<Vec<Category>, sqlx::Error> {
+pub async fn all(db: &Pool<Postgres>) -> Result<Vec<Category>, sqlx::Error> {
     sqlx::query_as!(Category, "SELECT * FROM categories")
-        .fetch_all(&mut **db)
+        .fetch_all(db)
         .await
 }
 

@@ -30,7 +30,7 @@ async function fetchItemTracker(id: number): Promise<ItemTracker> {
             return new ItemTracker(
                 data.id,
                 data.name,
-                data.priceData,
+                data.price_data,
                 data.currency,
                 data.icon,
                 data.link,

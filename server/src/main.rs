@@ -1,4 +1,4 @@
-use rocket::{fairing::AdHoc, http::Method};
+use rocket::{fairing::AdHoc, http::Method, Config};
 use rocket_cors::{AllowedOrigins, CorsOptions};
 use rocket_db_pools::Database;
 
@@ -10,7 +10,7 @@ mod persist;
 mod services;
 
 #[launch]
-fn rocket() -> _ {
+async fn rocket() -> _ {
     let cors = CorsOptions::default()
         .allowed_origins(AllowedOrigins::all())
         .allowed_methods(
@@ -21,7 +21,7 @@ fn rocket() -> _ {
         )
         .allow_credentials(true);
 
-    rocket::build()
+    let rocket = rocket::build()
         .attach(persist::Db::init())
         .attach(AdHoc::try_on_ignite(
             "DB Migrations",
@@ -31,5 +31,9 @@ fn rocket() -> _ {
         .mount("/", routes![api::index])
         .mount("/category", api::category::routes())
         .mount("/itemtracker", api::itemtracker::routes())
-        .mount("/stats", api::stats::routes())
+        .mount("/stats", api::stats::routes());
+
+    services::register_monitor(&rocket).await;
+
+    rocket
 }
