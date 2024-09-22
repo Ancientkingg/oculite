@@ -1,1 +1,2 @@
+- Write example monitor
 - Notification generation
