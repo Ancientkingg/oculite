@@ -1,4 +1,4 @@
-use rocket::{fairing::AdHoc, http::Method, Config};
+use rocket::{fairing::AdHoc, http::Method};
 use rocket_cors::{AllowedOrigins, CorsOptions};
 use rocket_db_pools::Database;
 

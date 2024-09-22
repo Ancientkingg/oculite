@@ -1,7 +1,10 @@
 use rocket::serde::{Deserialize, Serialize};
 use rocket_db_pools::Connection;
 use sqlx::{Pool, Postgres};
-use std::{fmt::{self, Display, Formatter}, hash::{Hash, Hasher}};
+use std::{
+    fmt::{self, Display, Formatter},
+    hash::{Hash, Hasher},
+};
 
 use super::Db;
 
@@ -60,7 +63,7 @@ pub async fn get_by_id(mut db: Connection<Db>, category_id: i32) -> Result<Categ
     .await
 }
 
-pub async fn add(mut db: Connection<Db>, category: Category) -> Result<Category, sqlx::Error> {
+pub async fn insert(mut db: Connection<Db>, category: Category) -> Result<Category, sqlx::Error> {
     sqlx::query_as!(
         Category,
         "INSERT INTO categories (category_id, category_name, config, url) VALUES ($1, $2, $3, $4) RETURNING *",
@@ -73,7 +76,13 @@ pub async fn add(mut db: Connection<Db>, category: Category) -> Result<Category,
     .await
 }
 
-pub async fn update(mut db: Connection<Db>, category_id: i32, category_name: Option<String>, config: Option<String>, url: Option<String>) -> Result<Category, sqlx::Error> {
+pub async fn update(
+    mut db: Connection<Db>,
+    category_id: i32,
+    category_name: Option<String>,
+    config: Option<String>,
+    url: Option<String>,
+) -> Result<Category, sqlx::Error> {
     sqlx::query_as!(
         Category,
         "UPDATE categories SET category_name = $2, config = $3, url = $4 WHERE category_id = $1 RETURNING *",

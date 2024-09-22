@@ -75,7 +75,7 @@ pub async fn add(db: Connection<Db>, category: Json<CategoryRequest>) -> (Status
         return (Status::BadRequest, "Category name and url are required");
     }
 
-    match persist::category::add(db, category.clone().into_inner().into()).await {
+    match persist::category::insert(db, category.clone().into_inner().into()).await {
         Ok(category) => {
             info!("Category {} added @ {}", category, category.url);
             (Status::Created, "Category added")

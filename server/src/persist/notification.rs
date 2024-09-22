@@ -20,7 +20,7 @@ pub async fn get_all(db: &Db) -> Result<Vec<Notification>, sqlx::Error> {
     Ok(rows)
 }
 
-pub async fn add(
+pub async fn insert(
     db: &Db,
     message: &str,
     icon: &str,
