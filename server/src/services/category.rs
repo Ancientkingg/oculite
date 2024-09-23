@@ -152,3 +152,7 @@ pub async fn fetch_category(category: Category) -> Result<Vec<ItemTracker>, reqw
         }})
         .collect())
 }
+
+pub async fn analyze_all(db: &PgPool) -> Result<(), sqlx::Error> {
+    todo!("Implement notification generation for all item trackers which have changed past a certain threshold")
+}
