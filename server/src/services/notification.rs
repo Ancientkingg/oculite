@@ -9,10 +9,14 @@ use sqlx::PgPool;
 
 use crate::persist;
 
-
 pub async fn insert_login(db: &PgPool, ip: &str) -> Result<(), sqlx::Error> {
-    
-    let message = std::format!("A login has been detected on {} from {}", Utc::now().with_timezone(&chrono_tz::Europe::Amsterdam).format("%Y-%m-%d %H:%M:%S"), ip);
+    let message = std::format!(
+        "A login has been detected on {} from {}",
+        Utc::now()
+            .with_timezone(&chrono_tz::Europe::Amsterdam)
+            .format("%Y-%m-%d %H:%M:%S"),
+        ip
+    );
     persist::notification::insert(db, &message, "pi-sign-in", "green", Utc::now()).await?;
 
     Ok(())
