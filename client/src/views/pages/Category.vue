@@ -30,8 +30,7 @@ watch(fetchedItemTrackers, () => {
             itemTrackerResponses.data = isLoading.value ? [] : fetchedItemTrackers.data!.map((id) => getItemTracker(id))
         })
     })
-}, { immediate: true })
-
+}, { immediate: true });
 </script>
 
 <template>

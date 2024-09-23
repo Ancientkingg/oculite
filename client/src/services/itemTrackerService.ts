@@ -21,6 +21,15 @@ export function getItemTracker(id: number) {
     return reactive({ isPending, isError, data, error });
 }
 
+export function getItemTrackerTest(id: number) {
+    const { isPending, isError, data, error } = useQuery({
+        queryKey: ['item-tracker', id],
+        queryFn: () => fetchItemTracker(id),
+    });
+
+    return { isPending, isError, data, error };
+}
+
 async function fetchItemTracker(id: number): Promise<ItemTracker> {
     return fetch(import.meta.env.VITE_API_BASE_URL + `it/${id}`, {
         method: 'GET',
@@ -66,9 +75,9 @@ export function favorite(item: ItemTracker) {
                 },
             ).then((res) => res.json()),
 
-        onSuccess: (itemTrackerId: number) => {
+        onSuccess: (itemTrackerId) => {
             queryClient.invalidateQueries({
-                queryKey: ['item-tracker', itemTrackerId],
+                queryKey: ['item-tracker', itemTrackerId.Data],
             });
         },
     });
@@ -88,9 +97,9 @@ export function unfavorite(item: ItemTracker) {
                     method: 'PUT',
                 },
             ).then((res) => res.json()),
-        onSuccess: (itemTrackerId: number) => {
+        onSuccess: (itemTrackerId) => {
             queryClient.invalidateQueries({
-                queryKey: ['item-tracker', itemTrackerId],
+                queryKey: ['item-tracker', itemTrackerId.Data],
             });
         },
     });

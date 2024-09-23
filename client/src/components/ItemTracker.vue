@@ -104,9 +104,9 @@ const favorite = () => {
     scope?.run(() => {
         app?.appContext.app.runWithContext(() => {
             if (model.value!.isFavorite()) {
-                favoriteApi(model.value!)
-            } else {
                 unfavoriteApi(model.value!)
+            } else {
+                favoriteApi(model.value!)
             }
         })
     })

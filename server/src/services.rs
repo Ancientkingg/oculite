@@ -1,5 +1,6 @@
-use rocket::{time::Duration, Build, Rocket};
+use rocket::{Build, Rocket};
 use sqlx::PgPool;
+use std::time::Duration;
 
 use crate::services;
 
