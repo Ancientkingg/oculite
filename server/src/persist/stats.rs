@@ -23,7 +23,7 @@ pub async fn get_rising_trackers(db: &Db) -> Result<i64, sqlx::Error> {
                 price_data
         )
         SELECT
-            COUNT(item_tracker)
+            COUNT(DISTINCT item_tracker)
         FROM
             latest_prices
         WHERE
@@ -50,7 +50,7 @@ pub async fn get_falling_trackers(db: &Db) -> Result<i64, sqlx::Error> {
                 price_data
         )
         SELECT
-            COUNT(item_tracker)
+            COUNT(DISTINCT item_tracker)
         FROM
             latest_prices
         WHERE
@@ -77,7 +77,7 @@ pub async fn get_stale_trackers(db: &Db) -> Result<i64, sqlx::Error> {
                 price_data
         )
         SELECT
-            COUNT(item_tracker)
+            COUNT(DISTINCT item_tracker)
         FROM
             latest_prices
         WHERE
