@@ -1,9 +1,11 @@
-use rocket::{Build, Rocket};
+use rocket::{time::Duration, Build, Rocket};
 use sqlx::PgPool;
 
 use crate::services;
 
 pub mod category;
+
+const DURATION: Duration = rocket::tokio::time::Duration::from_secs(10*60);
 
 pub async fn register_monitor(rocket: &Rocket<Build>) {
     let url = rocket
@@ -14,7 +16,7 @@ pub async fn register_monitor(rocket: &Rocket<Build>) {
 
     rocket::tokio::spawn(async move {
         let mut interval =
-            rocket::tokio::time::interval(rocket::tokio::time::Duration::from_secs(10));
+            rocket::tokio::time::interval(DURATION);
         loop {
             info!("Refreshing categories");
             services::category::refresh_all(&db)
