@@ -4,7 +4,11 @@ use chrono::Utc;
 use rocket::futures::future::join_all;
 use sqlx::PgPool;
 
-use crate::persist::{self, category::Category, itemtracker::ItemTracker};
+use crate::persist::{
+    self,
+    category::Category,
+    itemtracker::{ItemTracker, PriceData},
+};
 
 pub async fn filter_inactive_categories(it: Vec<(i32, Category)>) -> Vec<i32> {
     let mut cached_categories = HashMap::<Category, bool>::new();
@@ -90,8 +94,8 @@ pub async fn refresh_all(db: &PgPool) -> Result<(), RefreshError> {
             match price_data {
                 Some(price_data) => {
                     for price in price_data {
-                        let date = Utc::now();
-                        persist::itemtracker::add_price_data(db, id, price, date).await?;
+                        persist::itemtracker::add_price_data(db, id, price.price, price.date)
+                            .await?;
                     }
                 }
                 None => {
@@ -111,7 +115,18 @@ pub async fn refresh_all(db: &PgPool) -> Result<(), RefreshError> {
 
 #[derive(serde::Deserialize)]
 struct ItemTrackerResponse {
-    data: Vec<ItemTracker>,
+    data: Vec<ItemTrackerRaw>,
+}
+
+#[derive(serde::Deserialize)]
+struct ItemTrackerRaw {
+    id: i32,
+    name: String,
+    currency: String,
+    icon: String,
+    link: String,
+    favorite: bool,
+    price_data: f64,
 }
 
 pub async fn fetch_category(category: Category) -> Result<Vec<ItemTracker>, reqwest::Error> {
@@ -121,11 +136,19 @@ pub async fn fetch_category(category: Category) -> Result<Vec<ItemTracker>, reqw
     Ok(it_resp
         .data
         .into_iter()
-        .map(|mut x| {
-            x.category = Some(category.clone());
-            x.id = x.get_id() ^ category.category_id;
-
-            x
-        })
+        .map(|x| {
+            ItemTracker {
+                category: Some(category.clone()),
+                id: x.id ^ category.category_id,
+                name: x.name,
+                currency: Some(x.currency),
+                icon: Some(x.icon),
+                link: Some(x.link),
+                favorite: Some(x.favorite),
+                price_data: Some(vec![PriceData {
+                    price: x.price_data,
+                    date: Utc::now(),
+                }]),
+        }})
         .collect())
 }

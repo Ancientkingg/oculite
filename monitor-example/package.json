@@ -1,0 +1,23 @@
+{
+  "name": "monitor-example",
+  "version": "1.0.0",
+  "description": "An example of a monitor for Oculite",
+  "main": "src/index.js",
+  "scripts": {
+    "build": "npx tsc",
+    "dev": "nodemon src/index.ts",
+    "start": "ts-node src/index.ts"
+  },
+  "author": "Samuel Bruin",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^22.5.5",
+    "nodemon": "^3.1.7",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.2"
+  },
+  "dependencies": {
+    "express": "^4.21.0"
+  }
+}

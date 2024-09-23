@@ -30,7 +30,7 @@ async fn rocket() -> _ {
         .attach(cors.to_cors().unwrap())
         .mount("/", routes![api::index])
         .mount("/category", api::category::routes())
-        .mount("/itemtracker", api::itemtracker::routes())
+        .mount("/it", api::itemtracker::routes())
         .mount("/stats", api::stats::routes());
 
     services::register_monitor(&rocket).await;

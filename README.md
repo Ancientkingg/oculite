@@ -43,7 +43,7 @@ A monitor needs to expose a single REST API endpoint at `/` that returns the dat
             "currency": "€",
             "icon": "icon",
             "link": "https://google.com",
-            "price_data": [40.0] // Usually this array is of max length of 1
+            "price_data": 40.0
         }
     ]
 }
@@ -78,12 +78,7 @@ The JSON schema is as follows:
               "type": "string"
             },
             "price_data": {
-              "type": "array",
-              "items": [
-                {
-                  "type": "number"
-                }
-              ]
+              "type": "number",
             }
           },
           "required": [

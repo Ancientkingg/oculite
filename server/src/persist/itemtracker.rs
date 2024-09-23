@@ -21,7 +21,13 @@ pub struct ItemTracker {
     pub link: Option<String>,
     pub favorite: Option<bool>,
 
-    pub price_data: Option<Vec<f64>>,
+    pub price_data: Option<Vec<PriceData>>,
+}
+
+#[derive(sqlx::FromRow, Serialize, Deserialize, Clone, Debug)]
+pub struct PriceData {
+    pub price: f64,
+    pub date: DateTime<Utc>,
 }
 
 impl ItemTracker {
@@ -56,7 +62,7 @@ pub async fn get_by_id(
     id: ItemTrackerId,
 ) -> Result<ItemTracker, sqlx::Error> {
     let item_tracker = sqlx::query!(
-        "SELECT category_id, category_name, config, url, id, name, currency, icon, link, favorite, json_agg(pd.*) as price_data FROM item_trackers it JOIN categories c USING (category_id) LEFT JOIN price_data pd ON it.id=pd.item_tracker WHERE id = $1 GROUP BY it.id, c.category_id, c.url, c.category_name, c.config",
+        "SELECT category_id, category_name, config, url, id, name, currency, icon, link, favorite, json_agg(pd.price ORDER BY pd.date DESC) as price_data FROM item_trackers it JOIN categories c USING (category_id) LEFT JOIN price_data pd ON it.id=pd.item_tracker WHERE id = $1 GROUP BY it.id, c.category_id, c.url, c.category_name, c.config",
         id
     )
     .map(|row| {
@@ -67,6 +73,22 @@ pub async fn get_by_id(
             url: row.url,
         };
 
+        let price_data = match row.price_data {
+            Some(data) => {
+                let arr = data.as_array().unwrap();
+                arr.into_iter().map(|x| {
+                    let element = x.as_object().unwrap();
+                    let price = element.get("price").unwrap().as_f64().unwrap();
+                    let date = element.get("date").unwrap().as_str().unwrap();
+                    PriceData {
+                        price,
+                        date: DateTime::parse_from_str(date, "%Y-%m-%d %H:%M:%S%.f%#z").unwrap().with_timezone(&Utc),
+                    }
+                }).collect()
+            },
+            None => Vec::new()
+        };
+
         ItemTracker {
             category: Some(category),
             id: row.id,
@@ -75,7 +97,7 @@ pub async fn get_by_id(
             icon: row.icon,
             link: row.link,
             favorite: row.favorite,
-            price_data: Some(row.price_data.unwrap().as_array().unwrap().iter().map(|x| x.as_f64().unwrap()).collect()),
+            price_data: Some(price_data),
         }
     })
     .fetch_one(&mut **db)
