@@ -4,23 +4,33 @@
 // Category added notification
 // Inactive/old trackers deletion notification
 
+use chrono::Utc;
+use sqlx::PgPool;
 
-pub async fn insert_login() -> Result<(), sqlx::Error> {
-    todo!("Insert login notification")
+use crate::persist;
+use chrono_tz::Tz;
+
+
+pub async fn insert_login(db: &PgPool) -> Result<(), sqlx::Error> {
+    let message = std::format!("A login has been detected on {}", Utc::now().with_timezone(&chrono_tz::Europe::Amsterdam));
+
+    persist::notification::insert(db, &message, "pi-sign-in", "green", Utc::now()).await?;
+
+    Ok(())
 }
 
-pub async fn insert_price_change() -> Result<(), sqlx::Error> {
+pub async fn insert_price_change(db: &PgPool) -> Result<(), sqlx::Error> {
     todo!("Insert price change notification")
 }
 
-pub async fn insert_category_not_responding() -> Result<(), sqlx::Error> {
+pub async fn insert_category_not_responding(db: &PgPool) -> Result<(), sqlx::Error> {
     todo!("Insert category not responding notification")
 }
 
-pub async fn insert_category_added() -> Result<(), sqlx::Error> {
+pub async fn insert_category_added(db: &PgPool) -> Result<(), sqlx::Error> {
     todo!("Insert category added notification")
 }
 
-pub async fn insert_inactive_trackers_deletion() -> Result<(), sqlx::Error> {
+pub async fn insert_inactive_trackers_deletion(db: &PgPool) -> Result<(), sqlx::Error> {
     todo!("Insert inactive/old trackers deletion notification")
 }
