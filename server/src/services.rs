@@ -5,6 +5,7 @@ use std::time::Duration;
 use crate::services;
 
 pub mod category;
+pub mod notification;
 
 const DURATION: Duration = rocket::tokio::time::Duration::from_secs(10*60);
 
