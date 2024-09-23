@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use chrono::{DateTime, Utc};
 use rocket::serde::{Deserialize, Serialize};
 use rocket_db_pools::Connection;
@@ -22,6 +24,25 @@ pub struct ItemTracker {
     pub favorite: Option<bool>,
 
     pub price_data: Option<Vec<PriceData>>,
+}
+
+impl Display for ItemTracker {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "ItemTracker {{ id: {}, name: {}, category: {} }}",
+            self.id,
+            self.name,
+            self.category.clone()
+                .unwrap_or(Category {
+                    category_id: -1,
+                    category_name: String::from("None"),
+                    url: String::from("None"),
+                    config: None
+                })
+                .to_string()
+        )
+    }
 }
 
 #[derive(sqlx::FromRow, Serialize, Deserialize, Clone, Debug)]
@@ -183,12 +204,10 @@ pub async fn add_price_data(
 }
 
 pub async fn delete(db: &PgPool, id: ItemTrackerId) -> Result<ItemTrackerId, sqlx::Error> {
-    let item_tracker_id = sqlx::query_scalar!(
-        "DELETE FROM item_trackers WHERE id = $1 RETURNING id",
-        id
-    )
-    .fetch_one(db)
-    .await;
+    let item_tracker_id =
+        sqlx::query_scalar!("DELETE FROM item_trackers WHERE id = $1 RETURNING id", id)
+            .fetch_one(db)
+            .await;
 
     return item_tracker_id;
 }
