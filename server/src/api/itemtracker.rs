@@ -5,7 +5,7 @@ use rocket::{
 use rocket_db_pools::Connection;
 
 use crate::{
-    persist::{self, itemtracker::ItemTrackerId, Db},
+    persist::{self, itemtracker::{ItemTracker, ItemTrackerId}, Db},
     services::category::filter_inactive_categories,
 };
 
@@ -16,8 +16,14 @@ pub enum ItemTrackerResponse {
 }
 
 #[derive(Serialize)]
-pub enum SingleItemTrackerResponse {
+pub enum ItemTrackerIdResponse {
     Data(ItemTrackerId),
+    Error(&'static str),
+}
+
+#[derive(Serialize)]
+pub enum SingleItemTrackerResponse {
+    Data(ItemTracker),
     Error(&'static str),
 }
 
@@ -46,7 +52,7 @@ pub async fn get(db: Connection<Db>, id: i32) -> (Status, Json<SingleItemTracker
     match persist::itemtracker::get_by_id(db, id).await {
         Ok(it) => {
             info!("Item tracker found: {:?}", it);
-            (Status::Ok, Json(SingleItemTrackerResponse::Data(it.get_id())))
+            (Status::Ok, Json(SingleItemTrackerResponse::Data(it)))
         }
         Err(x) => {
             error!("Failed to get item tracker: {}", x);
@@ -61,17 +67,17 @@ pub async fn get(db: Connection<Db>, id: i32) -> (Status, Json<SingleItemTracker
 }
 
 #[put("/<id>/favorite")]
-pub async fn favorite(db: Connection<Db>, id: i32) -> (Status, Json<SingleItemTrackerResponse>) {
+pub async fn favorite(db: Connection<Db>, id: i32) -> (Status, Json<ItemTrackerIdResponse>) {
     match persist::itemtracker::set_favorite(db, id, true).await {
         Ok(it) => {
             info!("Item tracker favorited: {:?}", it);
-            (Status::Ok, Json(SingleItemTrackerResponse::Data(it)))
+            (Status::Ok, Json(ItemTrackerIdResponse::Data(it)))
         }
         Err(x) => {
             error!("Failed to favorite item tracker: {}", x);
             (
                 Status::InternalServerError,
-                Json(SingleItemTrackerResponse::Error(
+                Json(ItemTrackerIdResponse::Error(
                     "Failed to favorite item tracker",
                 )),
             )
@@ -80,17 +86,17 @@ pub async fn favorite(db: Connection<Db>, id: i32) -> (Status, Json<SingleItemTr
 }
 
 #[put("/<id>/unfavorite")]
-pub async fn unfavorite(db: Connection<Db>, id: i32) -> (Status, Json<SingleItemTrackerResponse>) {
+pub async fn unfavorite(db: Connection<Db>, id: i32) -> (Status, Json<ItemTrackerIdResponse>) {
     match persist::itemtracker::set_favorite(db, id, false).await {
         Ok(it) => {
             info!("Item tracker unfavorited: {:?}", it);
-            (Status::Ok, Json(SingleItemTrackerResponse::Data(it)))
+            (Status::Ok, Json(ItemTrackerIdResponse::Data(it)))
         }
         Err(x) => {
             error!("Failed to unfavorite item tracker: {}", x);
             (
                 Status::InternalServerError,
-                Json(SingleItemTrackerResponse::Error(
+                Json(ItemTrackerIdResponse::Error(
                     "Failed to unfavorite item tracker",
                 )),
             )

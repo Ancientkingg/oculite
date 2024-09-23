@@ -28,13 +28,16 @@ async function fetchItemTracker(id: number): Promise<ItemTracker> {
         .then((res) => res.json())
         .then((data) => {
             return new ItemTracker(
-                data.id,
-                data.name,
-                data.price_data,
-                data.currency,
-                data.icon,
-                data.link,
-                data.favorite,
+                data.Data.id,
+                data.Data.name,
+                {
+                    dates: data.Data.price_data.map((x) => new Date(x.date)),
+                    prices: data.Data.price_data.map((x) => x.price),
+                },
+                data.Data.currency,
+                data.Data.icon,
+                data.Data.link,
+                data.Data.favorite,
             );
         });
 }
