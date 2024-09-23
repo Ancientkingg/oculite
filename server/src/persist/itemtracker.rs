@@ -62,7 +62,7 @@ pub async fn get_by_id(
     id: ItemTrackerId,
 ) -> Result<ItemTracker, sqlx::Error> {
     let item_tracker = sqlx::query!(
-        "SELECT category_id, category_name, config, url, id, name, currency, icon, link, favorite, json_agg(pd.price ORDER BY pd.date DESC) as price_data FROM item_trackers it JOIN categories c USING (category_id) LEFT JOIN price_data pd ON it.id=pd.item_tracker WHERE id = $1 GROUP BY it.id, c.category_id, c.url, c.category_name, c.config",
+        "SELECT category_id, category_name, config, url, id, name, currency, icon, link, favorite, json_agg(pd.* ORDER BY pd.date DESC) as price_data FROM item_trackers it JOIN categories c USING (category_id) LEFT JOIN price_data pd ON it.id=pd.item_tracker WHERE id = $1 GROUP BY it.id, c.category_id, c.url, c.category_name, c.config",
         id
     )
     .map(|row| {
@@ -82,7 +82,7 @@ pub async fn get_by_id(
                     let date = element.get("date").unwrap().as_str().unwrap();
                     PriceData {
                         price,
-                        date: DateTime::parse_from_str(date, "%Y-%m-%d %H:%M:%S%.f%#z").unwrap().with_timezone(&Utc),
+                        date: DateTime::parse_from_rfc3339(date).unwrap().with_timezone(&Utc),
                     }
                 }).collect()
             },
