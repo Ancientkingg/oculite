@@ -30,11 +30,11 @@ I downloaded [Android Studio](https://developer.android.com/studio) and created 
 
 I then started sniffing the network traffic using [HTTP Toolkit](https://httptoolkit.com/). This was a fairly easy process to set up, since HTTP Toolkit took care of all of the configuration for me. It turned out there was one slight issue however.
 
-<img alt="HTTP Toolkit system trust is disabled", src="/@meta/images/autodoc/http_toolkit_app.png" height="25">
+<img alt="HTTP Toolkit system trust is disabled", src="/@meta/images/autodoc/http_toolkit_app.png" height="600">
 
 The issue was that the Android emulator did not (want to) install HTTP Toolkit's CA certificate as a system certificate, which meant that any apps who opted out of using user certificates would not work with HTTP Toolkit. To confirm this, I opened the AutoDoc app and like I suspected, the app kept loading indefinitely.
 
-<img alt="AutoDoc app keeps loading indefinitely", src="/@meta/images/autodoc/autodoc_app_loading.png" height="25">
+<img alt="AutoDoc app keeps loading indefinitely", src="/@meta/images/autodoc/autodoc_app_loading.png" height="600">
 
 Checking out the HTTP Toolkit logs, showed that the certificates were being rejected.
 
