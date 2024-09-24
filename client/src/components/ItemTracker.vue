@@ -132,7 +132,7 @@ const favorite = () => {
                     </h4>
                     <div class="card-price-divider" />
                     <h6 class="card-price-percentage">
-                        ({{ priceChange }}%)
+                        ({{ priceChange || 0 }}%)
                     </h6>
                 </div>
             </div>

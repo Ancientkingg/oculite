@@ -145,27 +145,26 @@ pub async fn insert(db: &PgPool, it: ItemTracker) -> Result<ItemTrackerId, sqlx:
 
 pub async fn update(db: &PgPool, it: &ItemTracker) -> Result<ItemTrackerId, sqlx::Error> {
     sqlx::query_scalar!(
-        "UPDATE item_trackers SET name = $2, currency = $3, icon = $4, link = $5, favorite = $6 WHERE id = $1 RETURNING id",
+        "UPDATE item_trackers SET name = COALESCE($2, name), currency = COALESCE($3, currency), icon = COALESCE($4, icon), link = COALESCE($5, link) WHERE id = $1 RETURNING id",
         it.get_id(),
         it.name,
         it.currency,
         it.icon,
-        it.link,
-        it.favorite
+        it.link
     )
     .fetch_one(db)
     .await
 }
 
 pub async fn get_ids_by_category(
-    mut db: Connection<Db>,
+    db: &PgPool,
     category_id: i32,
 ) -> Result<Vec<ItemTrackerId>, sqlx::Error> {
     let item_tracker_ids = sqlx::query_scalar!(
         "SELECT id FROM item_trackers JOIN categories USING (category_id) WHERE category_id = $1",
         category_id
     )
-    .fetch_all(&mut **db)
+    .fetch_all(db)
     .await;
 
     return item_tracker_ids;

@@ -33,6 +33,6 @@ CREATE TABLE IF NOT EXISTS public.price_data (
     item_tracker integer NOT NULL,
     date timestamp with time zone NOT NULL,
     price double precision NOT NULL,
-    FOREIGN KEY (item_tracker) REFERENCES public.item_trackers(id),
+    FOREIGN KEY (item_tracker) REFERENCES public.item_trackers(id) ON DELETE CASCADE,
     PRIMARY KEY (item_tracker, date)
 );

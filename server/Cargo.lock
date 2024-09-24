@@ -2069,6 +2069,7 @@ dependencies = [
  "rocket_cors",
  "rocket_db_pools",
  "serde",
+ "serde_json",
  "sqlx",
  "thiserror",
 ]

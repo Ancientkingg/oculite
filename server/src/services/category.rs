@@ -2,6 +2,7 @@ use std::collections::{HashMap, HashSet};
 
 use chrono::Utc;
 use rocket::futures::future::join_all;
+use serde_json::json;
 use sqlx::PgPool;
 
 use crate::persist::{
@@ -57,24 +58,34 @@ pub async fn refresh_all(db: &PgPool) -> Result<(), RefreshError> {
 
     let mut handles = Vec::with_capacity(categories.len());
 
-    for category in categories {
+    for category in categories.clone() {
         let it = fetch_category(category);
         handles.push(it);
     }
 
     let results = join_all(handles).await;
 
-    // Get all existing item trackers
-    let current_it = persist::itemtracker::all_ids(db).await?;
-    let current_it_ids = current_it
-        .into_iter()
-        .map(|(id, _)| id)
-        .collect::<HashSet<_>>();
+    let mut current_ids = HashSet::<i32>::new();
     let mut active_ids = HashSet::<i32>::new();
 
     // Go through the results
-    for result in results {
-        let it = result?;
+    for (idx, result) in results.into_iter().enumerate() {
+        let it = match result {
+            Ok(it) => it,
+            Err(e) => {
+                error!(
+                    "SKIPPING CATEGORY | Failed to fetch category {}: {}",
+                    categories.get(idx).unwrap(),
+                    e
+                );
+                continue;
+            }
+        };
+
+        let category_id = categories.get(idx).unwrap().category_id;
+        let current_category_it_ids = persist::itemtracker::get_ids_by_category(db, category_id).await?;
+
+        current_ids.extend(current_category_it_ids.clone());
 
         for item in it {
             let id = item.get_id();
@@ -82,7 +93,7 @@ pub async fn refresh_all(db: &PgPool) -> Result<(), RefreshError> {
 
             let price_data = item.price_data.clone();
 
-            if current_it_ids.contains(&id) {
+            if current_category_it_ids.contains(&id) {
                 // Update the item tracker
                 persist::itemtracker::update(db, &item).await?;
             } else {
@@ -106,7 +117,8 @@ pub async fn refresh_all(db: &PgPool) -> Result<(), RefreshError> {
     }
 
     // Delete inactive item trackers
-    for id in current_it_ids.difference(&active_ids) {
+    for id in current_ids.difference(&active_ids) {
+        info!("Deleting inactive item tracker: {}", id);
         persist::itemtracker::delete(db, *id).await?;
     }
 
@@ -125,31 +137,43 @@ struct ItemTrackerRaw {
     currency: String,
     icon: String,
     link: String,
-    favorite: bool,
     price_data: f64,
 }
 
 pub async fn fetch_category(category: Category) -> Result<Vec<ItemTracker>, reqwest::Error> {
-    let resp = reqwest::get(&category.url).await?;
+    let client = reqwest::Client::new();
+
+    info!("Fetching category: {:?}", category);
+
+    let resp = match &category.config {
+        Some(config) => {
+            client
+                .post(&category.url)
+                .json(&json!({"config": config}))
+                .send()
+                .await?
+        }
+        None => client.post(&category.url).json(&json!({"config": null})).send().await?,
+    };
+
     let it_resp = resp.json::<ItemTrackerResponse>().await?;
 
     Ok(it_resp
         .data
         .into_iter()
-        .map(|x| {
-            ItemTracker {
-                category: Some(category.clone()),
-                id: x.id ^ category.category_id,
-                name: x.name,
-                currency: Some(x.currency),
-                icon: Some(x.icon),
-                link: Some(x.link),
-                favorite: Some(x.favorite),
-                price_data: Some(vec![PriceData {
-                    price: x.price_data,
-                    date: Utc::now(),
-                }]),
-        }})
+        .map(|x| ItemTracker {
+            category: Some(category.clone()),
+            id: x.id ^ category.category_id,
+            name: x.name,
+            currency: Some(x.currency),
+            icon: Some(x.icon),
+            link: Some(x.link),
+            favorite: Some(false),
+            price_data: Some(vec![PriceData {
+                price: x.price_data,
+                date: Utc::now(),
+            }]),
+        })
         .collect())
 }
 

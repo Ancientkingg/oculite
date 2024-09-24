@@ -7,7 +7,7 @@ use crate::services;
 pub mod category;
 pub mod notification;
 
-const DURATION: Duration = rocket::tokio::time::Duration::from_secs(10*60);
+const DURATION: Duration = rocket::tokio::time::Duration::from_secs(10);
 
 pub async fn register_monitor(rocket: &Rocket<Build>) {
     let url = rocket
@@ -24,6 +24,7 @@ pub async fn register_monitor(rocket: &Rocket<Build>) {
             services::category::refresh_all(&db)
                 .await
                 .expect("Failed to refresh categories");
+            info!("Finished refreshing categories");
             interval.tick().await;
         }
     });

@@ -2,6 +2,10 @@
 
 A user-friendly dashboard for monitoring prices and values.
 
+![Oculite dashboard](/@meta/images/dashboard.png)
+![Oculite monitor](/@meta/images/category.png)
+![Oculite dashboard on mobile](/@meta/images/dashboard_mobile.png)
+
 ## Tech stack
 
 - [Rust](https://www.rust-lang.org/)
@@ -32,7 +36,7 @@ Since retrieving data from the sources can be very specific to the source, the m
 
 ## How to add a monitor
 
-A monitor needs to expose a single REST API endpoint at `/` that returns the data in the following JSON format:
+A monitor needs to expose a single REST API endpoint at `/` that returns data in the following JSON format:
 
 ```json
 {
@@ -49,7 +53,17 @@ A monitor needs to expose a single REST API endpoint at `/` that returns the dat
 }
 ```
 
-The JSON schema is as follows:
+When Oculite calls the monitor's API, it supplies a request body **TO** the monitor with the following format:
+
+```json
+interface RequestBody {
+  config: string | null;
+}
+```
+
+The request body can optionally contain the user's defined config for the monitor. The monitor can use this config to customize the data fetching process.
+
+The JSON schema of the endpoint response **TO** Oculite should be as follows:
 
 ```json
 {
@@ -98,3 +112,13 @@ The JSON schema is as follows:
   ]
 }
 ```
+
+## How Oculite came to be
+
+The whole idea of Oculite started back, when I went for my periodic vehicle inspection. It turned out that soon I would need new brakes. My dad at the time recommended me a website called [AutoDoc](https://autodoc.com). They sell car parts and accessories for a wide range of car brands. My dad mentioned to me that sometimes they would have discounts on their products, so he recommended to me to check their website from time to time. I, however, as a CSE student, thought that it would be a good idea to automate this process. I wanted to be able to see the price history of a product, and be able to get a notification when the price of a product drops. This is how Oculite came to be.
+
+I realized this idea could be useful in other situations as well. Monitoring the price, or rather more abstractly, the value of a particular item, could be useful in many situations. For example, monitoring the price of a stock, or monitoring the price of a product on Amazon. This is why I decided to make Oculite a more general tool, that can theoretically be used to monitor the price of any item on any website. Hence the choice of decoupling the data aggregation part of the project from the monitoring part. This way, in the future it would be easy for me (and maybe even for other developers), to add support for new sources to track items from.
+
+## Example monitors
+
+Two monitors are included in the project as examples. `monitor-example` is a monitor example that returns a static object to show how a monitor should be structured. `autodoc` is a monitor that fetches data from the AutoDoc website. Please read the [README.md](/monitors/autodoc/README.md) in the `autodoc` directory to read how the monitor works (quite interesting if I say so myself :D).

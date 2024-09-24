@@ -165,7 +165,7 @@ pub enum ItemTrackerPerCategoryResponse {
 
 #[get("/<category_id>/it")]
 pub async fn get_itemtrackers(
-    db: Connection<Db>,
+    db: &Db,
     category_id: i32,
 ) -> (Status, Json<ItemTrackerPerCategoryResponse>) {
     match persist::itemtracker::get_ids_by_category(db, category_id).await {

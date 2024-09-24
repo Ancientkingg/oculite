@@ -85,7 +85,7 @@ pub async fn update(
 ) -> Result<Category, sqlx::Error> {
     sqlx::query_as!(
         Category,
-        "UPDATE categories SET category_name = $2, config = $3, url = $4 WHERE category_id = $1 RETURNING *",
+        "UPDATE categories SET category_name = COALESCE($2, category_name), config = COALESCE($3, config), url = COALESCE($4, url) WHERE category_id = $1 RETURNING *",
         category_id,
         category_name,
         config,

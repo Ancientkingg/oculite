@@ -1,9 +1,3 @@
-// Login notification
-// Price change notification
-// Category not responding notification
-// Category added notification
-// Inactive/old trackers deletion notification
-
 use chrono::Utc;
 use sqlx::PgPool;
 
@@ -32,8 +26,4 @@ pub async fn insert_category_not_responding(db: &PgPool) -> Result<(), sqlx::Err
 
 pub async fn insert_category_added(db: &PgPool) -> Result<(), sqlx::Error> {
     todo!("Insert category added notification")
-}
-
-pub async fn insert_inactive_trackers_deletion(db: &PgPool) -> Result<(), sqlx::Error> {
-    todo!("Insert inactive/old trackers deletion notification")
 }

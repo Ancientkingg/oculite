@@ -1,24 +1,17 @@
 <script setup>
-import { useLayout } from '@/layout/composables/layout';
-import { computed } from 'vue';
 
-const { layoutConfig } = useLayout();
-
-const logoUrl = computed(() => {
-    return `/layout/images/${layoutConfig.darkTheme.value ? 'logo-white' : 'logo-dark'}.png`;
-});
 </script>
 
 <template>
     <div class="layout-footer">
-        <img
-            :src="logoUrl"
-            alt="Logo"
-            height="20"
-            class="mr-2"
-            >
+        <span style="margin-right: 0.75rem">👑</span>
         Made by
-        <span class="font-medium ml-2">Samuel Bruin</span>
+        <a
+            href="https://github.com/ancientkingg"
+            target="_blank"
+            class="font-medium ml-2"
+            style="margin-bottom: 0.05rem;"
+            >Samuel Bruin</a>
     </div>
 </template>
 <style lang="scss" scoped></style>

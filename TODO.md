@@ -1,3 +1,3 @@
 - Notification generation
 - Email or mobile notification generation
-- Category url parsing
+- PWA 
