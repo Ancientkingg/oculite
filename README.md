@@ -2,9 +2,9 @@
 
 A user-friendly dashboard for monitoring prices and values.
 
-![Oculite dashboard](/@meta/images/dashboard.png)
-![Oculite monitor](/@meta/images/category.png)
-![Oculite dashboard on mobile](/@meta/images/dashboard_mobile.png)
+<img alt="Oculite dashboard" src="/@meta/images/dashboard.png">
+<img alt="Oculite monitor" src="/@meta/images/category.png">
+<img alt="Oculite dashboard on mobile" src="/@meta/images/dashboard_mobile.png" height="25">
 
 ## Tech stack
 
@@ -13,6 +13,21 @@ A user-friendly dashboard for monitoring prices and values.
 - [Vue.js](https://vuejs.org/)
 - [PrimeVue](https://primevue.org/)
 - [Sakai](https://github.com/primefaces/sakai-vue/)
+
+## Required Environment
+
+### Server
+
+- `DATABASE_URL`
+
+### Client
+
+- `VITE_API_BASE_URL`
+
+### AutoDoc Monitor
+
+- `API_BASE_URL`
+- `API_TOKEN`
 
 ## How it works
 
