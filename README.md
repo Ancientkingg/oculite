@@ -4,7 +4,7 @@ A user-friendly dashboard for monitoring prices and values.
 
 <img alt="Oculite dashboard" src="/@meta/images/dashboard.png">
 <img alt="Oculite monitor" src="/@meta/images/category.png">
-<img alt="Oculite dashboard on mobile" src="/@meta/images/dashboard_mobile.png" height="600">
+<img alt="Oculite dashboard on mobile" src="/@meta/images/dashboard_mobile.png" height="768">
 
 ## Tech stack
 

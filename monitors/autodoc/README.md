@@ -10,7 +10,7 @@ To be able to monitor the prices of certain products, I had to find a way to fet
 
 My first instinct was to look at the AutoDoc website. After investigating the network requests sent, when on a product page, I unfortunately came to the conclusion I had to look elsewhere. It turned out that the website provided all of the product data statically in the HTML, and the price was not fetched using a back-end API.
 
-<img alt="Static data embedded into the HTML", src="/@meta/images/autodoc/website.png">
+<img alt="Static data embedded into the HTML" src="/@meta/images/autodoc/website.png">
 
 I did not want to write a web scraper, as I felt like this would be unreliable and could break at any time. I wanted to find a more stable solution with a better user-experience. Ultimately, my goal was to allow users to able to paste a link to a product in Oculite, and it would automatically start monitoring the price.
 
@@ -30,21 +30,21 @@ I downloaded [Android Studio](https://developer.android.com/studio) and created 
 
 I then started sniffing the network traffic using [HTTP Toolkit](https://httptoolkit.com/). This was a fairly easy process to set up, since HTTP Toolkit took care of all of the configuration for me. It turned out there was one slight issue however.
 
-<img alt="HTTP Toolkit system trust is disabled", src="/@meta/images/autodoc/http_toolkit_app.png" height="600">
+<img alt="HTTP Toolkit system trust is disabled" src="/@meta/images/autodoc/http_toolkit_app.png" height="768">
 
 The issue was that the Android emulator did not (want to) install HTTP Toolkit's CA certificate as a system certificate, which meant that any apps who opted out of using user certificates would not work with HTTP Toolkit. To confirm this, I opened the AutoDoc app and like I suspected, the app kept loading indefinitely.
 
-<img alt="AutoDoc app keeps loading indefinitely", src="/@meta/images/autodoc/autodoc_app_loading.png" height="600">
+<img alt="AutoDoc app keeps loading indefinitely" src="/@meta/images/autodoc/autodoc_app_loading.png" height="768">
 
 Checking out the HTTP Toolkit logs, showed that the certificates were being rejected.
 
-<img alt="HTTP Toolkit logs showing certificate rejection", src="/@meta/images/autodoc/http_toolkit_no_trust.png">
+<img alt="HTTP Toolkit logs showing certificate rejection" src="/@meta/images/autodoc/http_toolkit_no_trust.png">
 
 After some investigation, the reason for this was the following, according to the HTTP Toolkit docs, "This (System Trust disabled) is common and unavoidable when using HTTP Toolkit on non-rooted devices or locked-down emulators such as the 'Google Play' official emulator builds.". It turns out that was using an emulator build where Google Play services were enabled.
 
 So, the solution was to switch to a different emulator build, where Google Play services were not enabled. I opted for the "Android 12.0 ("S") | x86_64" build. I installed the AutoDoc app through the APK on this new emulator build, as well as enabled HTTP Toolkit for this emulator build and opened the AutoDoc app.
 
-<img alt="AutoDoc app shows API requests", src="/@meta/images/autodoc/android_emulator.png">
+<img alt="AutoDoc app shows API requests" src="/@meta/images/autodoc/android_emulator.png">
 
 It worked! The AutoDoc app was now showing API requests in HTTP Toolkit. I could now start analyzing the network requests sent by the AutoDoc app.
 
@@ -52,11 +52,11 @@ It worked! The AutoDoc app was now showing API requests in HTTP Toolkit. I could
 
 HTTP Toolkit showed a bunch of network request being sent by the AutoDoc app. One particularly stood out to me. A request was being made to `apim.autodoc.de`. The descriptive name of the endpoint, `apim`, made me think that this was the API endpoint that the AutoDoc app was using to fetch the product data. I started analyzing the response body.
 
-<img alt="AutoDoc API response", src="/@meta/images/autodoc/http_response_body.png">
+<img alt="AutoDoc API response" src="/@meta/images/autodoc/http_response_body.png">
 
 The response body seems to contain all of the product data that I was able to see on the product page. This was great news! I could now analyzing this request to see how I could replicate it. Beware, the following screenshot will look like something straight out of a classified FBI report.
 
-<img alt="AutoDoc API request", src="/@meta/images/autodoc/request_headers.png">
+<img alt="AutoDoc API request" src="/@meta/images/autodoc/request_headers.png">
 
 The request headers contained a lot of information. The only vital headers for a successful API query were the `api-project-country`, `api-project-lang`, `api-platform`, `api-version` and `api-token` headers. The `api-token` and `api-platform` are self-explanatory. After some experimenting I found out that `api-project-lang`, like the name suggests, controls the language of the API response; Changing it to 9, changed the response body to Dutch and changing it to 4 changed the response body to English. The `api-version` interestingly controlled the output of the response. When not included the name of the product used commas instead of `|`, but this is for the most part irrelevant to our goal. The `api-project-country` header was required to be set in the request, but was irrelevant to me since I had no intention of changing the country of the API response and I had all of the data I needed in the response body.
 
