@@ -104,7 +104,7 @@ A monitor needs to expose a single REST API endpoint at `/` that returns data in
 
 When Oculite calls the monitor's API, it supplies a request body **TO** the monitor with the following format:
 
-```json
+```js
 interface RequestBody {
   config: string | null;
 }
