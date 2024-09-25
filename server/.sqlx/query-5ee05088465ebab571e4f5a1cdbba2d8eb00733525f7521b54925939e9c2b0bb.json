@@ -1,0 +1,26 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE item_trackers SET name = COALESCE($2, name), currency = COALESCE($3, currency), icon = COALESCE($4, icon), link = COALESCE($5, link) WHERE id = $1 RETURNING id",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int4"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Varchar",
+        "Varchar",
+        "Text",
+        "Varchar"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "5ee05088465ebab571e4f5a1cdbba2d8eb00733525f7521b54925939e9c2b0bb"
+}

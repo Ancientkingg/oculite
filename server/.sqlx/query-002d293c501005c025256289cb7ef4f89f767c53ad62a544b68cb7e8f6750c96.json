@@ -1,0 +1,38 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT * FROM categories",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "url",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 1,
+        "name": "category_id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 2,
+        "name": "config",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "category_name",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      false
+    ]
+  },
+  "hash": "002d293c501005c025256289cb7ef4f89f767c53ad62a544b68cb7e8f6750c96"
+}

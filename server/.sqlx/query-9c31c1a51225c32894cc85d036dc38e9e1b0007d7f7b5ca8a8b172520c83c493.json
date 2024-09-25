@@ -1,0 +1,44 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT id, category_id, url, category_name, config FROM item_trackers JOIN categories USING (category_id)",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 1,
+        "name": "category_id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 2,
+        "name": "url",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "category_name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "config",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      true
+    ]
+  },
+  "hash": "9c31c1a51225c32894cc85d036dc38e9e1b0007d7f7b5ca8a8b172520c83c493"
+}

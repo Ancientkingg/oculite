@@ -12,7 +12,7 @@ pub mod notification;
 
 pub async fn run_migrations(rocket: Rocket<Build>) -> fairing::Result {
     match Db::fetch(&rocket) {
-        Some(db) => match sqlx::migrate!("persist/migrations").run(&**db).await {
+        Some(db) => match sqlx::migrate!().run(&**db).await {
             Ok(_) => Ok(rocket),
             Err(e) => {
                 error!("Failed to run database migrations: {}", e);
