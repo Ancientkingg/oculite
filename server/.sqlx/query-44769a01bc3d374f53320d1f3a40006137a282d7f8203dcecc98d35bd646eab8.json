@@ -1,0 +1,20 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "WITH latest_prices AS (\n            SELECT\n                item_tracker,\n                price AS latest_price,\n                date AS latest_date,\n                LAG(price) OVER (PARTITION BY item_tracker ORDER BY date DESC) AS second_latest_price\n            FROM\n                price_data\n        )\n        SELECT\n            COUNT(DISTINCT item_tracker)\n        FROM\n            latest_prices\n        WHERE\n            ABS(latest_price - second_latest_price) <= (latest_price * 0.02);",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "count",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "44769a01bc3d374f53320d1f3a40006137a282d7f8203dcecc98d35bd646eab8"
+}
