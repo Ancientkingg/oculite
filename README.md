@@ -16,6 +16,38 @@ A user-friendly dashboard for monitoring prices and values.
 - [PrimeVue](https://primevue.org/)
 - [Sakai](https://github.com/primefaces/sakai-vue/)
 
+## How to run
+
+### Server
+
+To start the server run the following command:
+
+```
+cargo run // runs the server in debug release
+```
+
+### Client
+
+The client can be started using the Vite development server. To start the client run the following command:
+
+```bash
+npm run dev
+```
+
+Optionally, the client can be built and automatically 'deployed' to the back-end by running the following command:
+
+```bash
+npm run deploy // builds the front-end and puts the files in the back-end's `public` directory to be served
+```
+
+### Monitor
+
+To run the monitors, navigate to the `monitors` directory and run the following command:
+
+```bash
+npm run start
+
+
 ## Required Environment
 
 ### Server
