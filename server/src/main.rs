@@ -1,7 +1,7 @@
-use std::env;
 use dotenv::dotenv;
+use std::env;
 
-use rocket::{fairing::AdHoc, http::Method};
+use rocket::{fairing::AdHoc, fs::FileServer, http::Method};
 use rocket_cors::{AllowedOrigins, CorsOptions};
 use rocket_db_pools::Database;
 
@@ -38,10 +38,11 @@ async fn rocket() -> _ {
             persist::run_migrations,
         ))
         .attach(cors.to_cors().unwrap())
-        .mount("/", routes![api::index])
-        .mount("/category", api::category::routes())
-        .mount("/it", api::itemtracker::routes())
-        .mount("/stats", api::stats::routes());
+        .mount("/", FileServer::from("public"))
+        .mount("/api", routes![api::index])
+        .mount("/api/category", api::category::routes())
+        .mount("/api/it", api::itemtracker::routes())
+        .mount("/api/stats", api::stats::routes());
 
     services::register_monitor(&rocket).await;
 

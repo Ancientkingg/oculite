@@ -1,3 +1,5 @@
 - Notification generation
 - Email or mobile notification generation
-- PWA 
+- PWA
+- Improve error handling server-side
+- Static site generation

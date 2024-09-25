@@ -4,5 +4,5 @@ pub mod stats;
 
 #[get("/")]
 pub fn index() -> &'static str {
-    "Hello, world!"
+    "I am here! HEALTHY"
 }

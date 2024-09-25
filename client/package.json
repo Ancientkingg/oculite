@@ -5,6 +5,7 @@
     "type": "module",
     "scripts": {
         "dev": "vite",
+        "deploy": "vue-tsc -b && vite build --emptyOutDir --outDir ../server/public",
         "build": "vue-tsc -b && vite build",
         "lint": "npm run lint:fix",
         "lint:fix": "eslint --ext .ts,.vue src --fix",

@@ -1,0 +1,30 @@
+name: Rust CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main", "prod" ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Rust Cache
+      uses: Swatinem/rust-cache@v2.7.3
+      with:
+        workspaces: "server"
+
+    - name: Build
+      run: cargo build --verbose
+      working-directory: ./server
+    - name: Run tests
+      run: cargo test --verbose
+      working-directory: ./server
