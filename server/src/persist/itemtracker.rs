@@ -33,7 +33,8 @@ impl Display for ItemTracker {
             "ItemTracker {{ id: {}, name: {}, category: {} }}",
             self.id,
             self.name,
-            self.category.clone()
+            self.category
+                .clone()
                 .unwrap_or(Category {
                     category_id: -1,
                     category_name: String::from("None"),

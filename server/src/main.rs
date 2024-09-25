@@ -1,3 +1,6 @@
+use std::env;
+use dotenv::dotenv;
+
 use rocket::{fairing::AdHoc, http::Method};
 use rocket_cors::{AllowedOrigins, CorsOptions};
 use rocket_db_pools::Database;
@@ -11,6 +14,8 @@ mod services;
 
 #[launch]
 async fn rocket() -> _ {
+    dotenv().ok();
+
     let cors = CorsOptions::default()
         .allowed_origins(AllowedOrigins::all())
         .allowed_methods(
@@ -21,7 +26,12 @@ async fn rocket() -> _ {
         )
         .allow_credentials(true);
 
-    let rocket = rocket::build()
+    let db_figment = rocket::Config::figment().merge((
+        "databases.db.url",
+        env::var("DATABASE_URL").expect("DATABASE_URL must be set"),
+    ));
+
+    let rocket = rocket::custom(db_figment)
         .attach(persist::Db::init())
         .attach(AdHoc::try_on_ignite(
             "DB Migrations",

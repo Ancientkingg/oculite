@@ -2,7 +2,7 @@ use super::Db;
 
 pub async fn get_total_trackers(db: &Db) -> Result<i64, sqlx::Error> {
     let row = sqlx::query_scalar!("SELECT COUNT(*) FROM item_trackers")
-        .fetch_one(&(*db).0)  // Mutable dereference
+        .fetch_one(&(*db).0) // Mutable dereference
         .await?;
 
     match row {
