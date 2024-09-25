@@ -46,7 +46,7 @@ To run the monitors, navigate to the `monitors` directory and run the following 
 
 ```bash
 npm run start
-
+```
 
 ## Required Environment
 
