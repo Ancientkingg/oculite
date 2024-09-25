@@ -7,7 +7,7 @@ use crate::services;
 pub mod category;
 pub mod notification;
 
-const DURATION: Duration = rocket::tokio::time::Duration::from_secs(10);
+const DURATION: Duration = rocket::tokio::time::Duration::from_secs(3*60*60);
 
 pub async fn register_monitor(rocket: &Rocket<Build>) {
     let url = rocket
