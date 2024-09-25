@@ -23,7 +23,7 @@ A user-friendly dashboard for monitoring prices and values.
 To start the server run the following command:
 
 ```bash
-cargo run // runs the server in debug release
+cargo run # runs the server in debug release
 ```
 
 ### Client
@@ -37,7 +37,7 @@ npm run dev
 Optionally, the client can be built and automatically 'deployed' to the back-end by running the following command:
 
 ```bash
-npm run deploy // builds the front-end and puts the files in the back-end's `public` directory to be served
+npm run deploy # builds the front-end and puts the files in the back-end's `public` directory to be served
 ```
 
 ### Monitor
