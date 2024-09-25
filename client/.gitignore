@@ -5,3 +5,5 @@ components.d.ts
 eslint_report.json
 
 dist
+
+.env
