@@ -22,7 +22,7 @@ A user-friendly dashboard for monitoring prices and values.
 
 To start the server run the following command:
 
-```
+```bash
 cargo run // runs the server in debug release
 ```
 
