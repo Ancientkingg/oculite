@@ -97,14 +97,14 @@ pub async fn get_by_id(
 
         let price_data = match row.price_data {
             Some(data) => {
-                let arr = data.as_array().unwrap();
+                let arr = data.as_array().expect("Price data column cannot be parsed as a JSON array");
                 arr.into_iter().map(|x| {
-                    let element = x.as_object().unwrap();
-                    let price = element.get("price").unwrap().as_f64().unwrap();
-                    let date = element.get("date").unwrap().as_str().unwrap();
+                    let element = x.as_object().expect("Element of price data array cannot be parsed as an object");
+                    let price = element.get("price").expect("`price` property cannot be fetched from price data").as_f64().expect("`price` property cannot be parsed as f64");
+                    let date = element.get("date").expect("`date` property cannot be fetched from price data").as_str().expect("`date` property cannot be parsed as a string");
                     PriceData {
                         price,
-                        date: DateTime::parse_from_rfc3339(date).unwrap().with_timezone(&Utc),
+                        date: DateTime::parse_from_rfc3339(date).expect("`date` property string cannot be parsed as an RFC3339 timestamp").with_timezone(&Utc),
                     }
                 }).collect()
             },

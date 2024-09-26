@@ -22,9 +22,9 @@ impl From<CategoryRequest> for Category {
     fn from(req: CategoryRequest) -> Self {
         Category {
             category_id: rand::random::<u16>() as i32,
-            category_name: req.name.or(Some("".to_string())).unwrap(),
+            category_name: req.name.unwrap_or("".to_string()),
             config: req.config,
-            url: req.url.or(Some("".to_string())).unwrap(),
+            url: req.url.unwrap_or("".to_string()),
         }
     }
 }

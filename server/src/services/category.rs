@@ -75,14 +75,14 @@ pub async fn refresh_all(db: &PgPool) -> Result<(), RefreshError> {
             Err(e) => {
                 error!(
                     "SKIPPING CATEGORY | Failed to fetch category {}: {}",
-                    categories.get(idx).unwrap(),
+                    categories.get(idx).expect("Unable to get corresponding category to item tracker result. Categories don't match!"),
                     e
                 );
                 continue;
             }
         };
 
-        let category_id = categories.get(idx).unwrap().category_id;
+        let category_id = categories.get(idx).expect("Unable to get corresponding category to item tracker result. Categories don't match!").category_id;
         let current_category_it_ids = persist::itemtracker::get_ids_by_category(db, category_id).await?;
 
         current_ids.extend(current_category_it_ids.clone());

@@ -37,7 +37,7 @@ async fn rocket() -> _ {
             "DB Migrations",
             persist::run_migrations,
         ))
-        .attach(cors.to_cors().unwrap())
+        .attach(cors.to_cors().expect("CORS failed to initialize"))
         .mount("/", FileServer::from("public"))
         .mount("/api", routes![api::index])
         .mount("/api/category", api::category::routes())
