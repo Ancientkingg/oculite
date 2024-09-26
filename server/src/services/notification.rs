@@ -27,7 +27,7 @@ pub async fn insert_price_change(db: &PgPool, it_name: &str, price_change_percen
             .with_timezone(&chrono_tz::Europe::Amsterdam)
             .format("%Y-%m-%d %H:%M:%S"),
     );
-    persist::notification::insert(db, &message, "pi-sign-in", "green", Utc::now()).await?;
+    persist::notification::insert(db, &message, "pi-dollar", "green", Utc::now()).await?;
 
     Ok(())
 }
@@ -40,7 +40,7 @@ pub async fn insert_category_not_responding(db: &PgPool, category_name: &str) ->
             .with_timezone(&chrono_tz::Europe::Amsterdam)
             .format("%Y-%m-%d %H:%M:%S"),
     );
-    persist::notification::insert(db, &message, "pi-sign-in", "green", Utc::now()).await?;
+    persist::notification::insert(db, &message, "pi-exclamation-triangle", "green", Utc::now()).await?;
 
     Ok(())
 }
@@ -53,7 +53,7 @@ pub async fn insert_category_added(db: &PgPool, category_name: &str) -> Result<(
             .format("%Y-%m-%d %H:%M:%S"),
         category_name
     );
-    persist::notification::insert(db, &message, "pi-sign-in", "green", Utc::now()).await?;
+    persist::notification::insert(db, &message, "pi-folder-plus", "green", Utc::now()).await?;
 
     Ok(())
 }
