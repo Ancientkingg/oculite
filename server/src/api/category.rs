@@ -3,8 +3,7 @@ use crate::{
     services::{self, notification},
 };
 use rocket::{
-    http::Status,
-    serde::{json::Json, Deserialize, Serialize},
+    futures, http::Status, serde::{json::Json, Deserialize, Serialize}
 };
 use rocket_db_pools::Connection;
 
@@ -83,7 +82,13 @@ pub async fn add(db: &Db, category: Json<CategoryRequest>) -> (Status, &'static 
             info!("Category {} added @ {}", category, category.url);
             let _ = notification::insert_category_added(db, &category.category_name).await;
 
-            services::run_monitor(db).await;
+            match services::run_monitor(db).await {
+                Ok(_) => info!("Monitor exited successfully"),
+                Err(e) => {
+                    error!("Monitor exited with error: {}", e);
+                    return (Status::InternalServerError, "Category added but is not responding");
+                },
+            };
 
             (Status::Created, "Category added")
         }

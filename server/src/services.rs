@@ -1,3 +1,4 @@
+use category::RefreshError;
 use chrono::{DateTime, Utc};
 use rocket::{
     fairing::{Fairing, Kind},
@@ -23,24 +24,25 @@ pub async fn register_monitor(rocket: &Rocket<Build>) {
     let db = PgPool::connect(&url).await.expect("Database not attached");
 
     rocket::tokio::spawn(async move {
-        run_monitor(&db).await;
+        match run_monitor(&db).await {
+            Ok(_) => info!("Monitor exited successfully"),
+            Err(e) => error!("Monitor exited with error: {}", e),
+        }
     });
 }
 
-pub async fn run_monitor(db: &PgPool) {
+pub async fn run_monitor(db: &PgPool) -> Result<(), RefreshError> {
     let mut interval = rocket::tokio::time::interval(DURATION);
     loop {
         info!("Refreshing categories");
 
         services::category::refresh_all(db)
-            .await
-            .expect("Failed to refresh categories");
+            .await?;
 
         info!("Finished refreshing categories");
 
         services::category::analyze_all(db, DELTA)
-            .await
-            .expect("Failed to analyze item trackers");
+            .await?;
         interval.tick().await;
     }
 }
