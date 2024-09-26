@@ -1,6 +1,6 @@
 use crate::{
     persist::{self, category::Category, itemtracker::ItemTrackerId, Db},
-    services::notification,
+    services::{self, notification},
 };
 use rocket::{
     http::Status,
@@ -82,6 +82,9 @@ pub async fn add(db: &Db, category: Json<CategoryRequest>) -> (Status, &'static 
         Ok(category) => {
             info!("Category {} added @ {}", category, category.url);
             let _ = notification::insert_category_added(db, &category.category_name).await;
+
+            services::run_monitor(db).await;
+
             (Status::Created, "Category added")
         }
         Err(x) => {

@@ -23,22 +23,26 @@ pub async fn register_monitor(rocket: &Rocket<Build>) {
     let db = PgPool::connect(&url).await.expect("Database not attached");
 
     rocket::tokio::spawn(async move {
-        let mut interval = rocket::tokio::time::interval(DURATION);
-        loop {
-            info!("Refreshing categories");
-
-            services::category::refresh_all(&db)
-                .await
-                .expect("Failed to refresh categories");
-
-            info!("Finished refreshing categories");
-
-            services::category::analyze_all(&db, DELTA)
-                .await
-                .expect("Failed to analyze item trackers");
-            interval.tick().await;
-        }
+        run_monitor(&db).await;
     });
+}
+
+pub async fn run_monitor(db: &PgPool) {
+    let mut interval = rocket::tokio::time::interval(DURATION);
+    loop {
+        info!("Refreshing categories");
+
+        services::category::refresh_all(db)
+            .await
+            .expect("Failed to refresh categories");
+
+        info!("Finished refreshing categories");
+
+        services::category::analyze_all(db, DELTA)
+            .await
+            .expect("Failed to analyze item trackers");
+        interval.tick().await;
+    }
 }
 
 #[derive(Default, Clone)]
@@ -69,7 +73,9 @@ impl Fairing for Logins {
         let ip = request.client_ip().unwrap();
 
         if let std::collections::hash_map::Entry::Vacant(e) = logins.entry(ip) {
-            notification::insert_login(db, &ip.to_string()).await.expect("Failed to generate login notification");
+            notification::insert_login(db, &ip.to_string())
+                .await
+                .expect("Failed to generate login notification");
             e.insert(Utc::now());
         }
     }
