@@ -3,7 +3,8 @@ use std::fmt::Display;
 use chrono::{DateTime, Utc};
 use rocket::serde::{Deserialize, Serialize};
 use rocket_db_pools::Connection;
-use sqlx::PgPool;
+use serde_json::Value;
+use sqlx::{postgres::PgRow, PgPool, Row};
 
 use super::{
     category::{self, Category},
@@ -78,54 +79,85 @@ pub async fn all_ids(db: &PgPool) -> Result<Vec<(ItemTrackerId, Category)>, sqlx
     return item_tracker_ids;
 }
 
+fn convert_to_item_tracker(row: PgRow) -> ItemTracker {
+    let category = Category {
+        category_id: row.get("category_id"),
+        category_name: row.get("category_name"),
+        config: row.get("config"),
+        url: row.get("url"),
+    };
+
+    let price_data = match row.get::<std::option::Option<Value>, &str>("price_data") {
+        Some(data) => {
+            let arr = data
+                .as_array()
+                .expect("Price data column cannot be parsed as a JSON array");
+            arr.into_iter()
+                .map(|x| {
+                    let element = x
+                        .as_object()
+                        .expect("Element of price data array cannot be parsed as an object");
+                    let price = element
+                        .get("price")
+                        .expect("`price` property cannot be fetched from price data")
+                        .as_f64()
+                        .expect("`price` property cannot be parsed as f64");
+                    let date = element
+                        .get("date")
+                        .expect("`date` property cannot be fetched from price data")
+                        .as_str()
+                        .expect("`date` property cannot be parsed as a string");
+                    PriceData {
+                        price,
+                        date: DateTime::parse_from_rfc3339(date)
+                            .expect(
+                                "`date` property string cannot be parsed as an RFC3339 timestamp",
+                            )
+                            .with_timezone(&Utc),
+                    }
+                })
+                .collect()
+        }
+        None => Vec::new(),
+    };
+
+    ItemTracker {
+        category: Some(category),
+        id: row.get("id"),
+        name: row.get("name"),
+        currency: row.get("currency"),
+        icon: row.get("icon"),
+        link: row.get("link"),
+        favorite: row.get("favorite"),
+        price_data: Some(price_data),
+    }
+}
+
 #[allow(dead_code)]
 pub async fn get_by_id(
     mut db: Connection<Db>,
     id: ItemTrackerId,
 ) -> Result<ItemTracker, sqlx::Error> {
-    let item_tracker = sqlx::query!(
-        "SELECT category_id, category_name, config, url, id, name, currency, icon, link, favorite, json_agg(pd.* ORDER BY pd.date DESC) as price_data FROM item_trackers it JOIN categories c USING (category_id) LEFT JOIN price_data pd ON it.id=pd.item_tracker WHERE id = $1 GROUP BY it.id, c.category_id, c.url, c.category_name, c.config",
-        id
+    let item_tracker = sqlx::query(
+        "SELECT category_id, category_name, config, url, id, name, currency, icon, link, favorite, json_agg(pd.* ORDER BY pd.date DESC) as price_data FROM item_trackers it JOIN categories c USING (category_id) LEFT JOIN price_data pd ON it.id=pd.item_tracker WHERE id = $1 GROUP BY it.id, c.category_id, c.url, c.category_name, c.config"
     )
-    .map(|row| {
-        let category = Category {
-            category_id: row.category_id,
-            category_name: row.category_name,
-            config: row.config,
-            url: row.url,
-        };
-
-        let price_data = match row.price_data {
-            Some(data) => {
-                let arr = data.as_array().expect("Price data column cannot be parsed as a JSON array");
-                arr.into_iter().map(|x| {
-                    let element = x.as_object().expect("Element of price data array cannot be parsed as an object");
-                    let price = element.get("price").expect("`price` property cannot be fetched from price data").as_f64().expect("`price` property cannot be parsed as f64");
-                    let date = element.get("date").expect("`date` property cannot be fetched from price data").as_str().expect("`date` property cannot be parsed as a string");
-                    PriceData {
-                        price,
-                        date: DateTime::parse_from_rfc3339(date).expect("`date` property string cannot be parsed as an RFC3339 timestamp").with_timezone(&Utc),
-                    }
-                }).collect()
-            },
-            None => Vec::new()
-        };
-
-        ItemTracker {
-            category: Some(category),
-            id: row.id,
-            name: row.name,
-            currency: row.currency,
-            icon: row.icon,
-            link: row.link,
-            favorite: row.favorite,
-            price_data: Some(price_data),
-        }
-    })
+    .bind(id)
+    .map(convert_to_item_tracker)
     .fetch_one(&mut **db)
     .await;
 
     return item_tracker;
+}
+
+pub async fn all(db: &PgPool) -> Result<Vec<ItemTracker>, sqlx::Error> {
+    let item_trackers = sqlx::query(
+        "SELECT category_id, category_name, config, url, id, name, currency, icon, link, favorite, json_agg(pd.* ORDER BY pd.date DESC) as price_data FROM item_trackers it JOIN categories c USING (category_id) LEFT JOIN price_data pd ON it.id=pd.item_tracker GROUP BY it.id, c.category_id, c.url, c.category_name, c.config"
+    )
+    .map(convert_to_item_tracker)
+    .fetch_all(db)
+    .await;
+
+    return item_trackers;
 }
 
 pub async fn insert(db: &PgPool, it: ItemTracker) -> Result<ItemTrackerId, sqlx::Error> {
