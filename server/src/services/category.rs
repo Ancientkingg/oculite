@@ -194,8 +194,12 @@ pub async fn analyze_all(db: &PgPool, significance_delta: f64) -> Result<(), sql
     for it in its {
         let price_data = it.price_data.expect("No price data for item tracker");
 
-        let latest_price = &price_data[0];
-        let previous_price = &price_data[1];
+        let default_price = PriceData {
+            price: 0.0,
+            date: Utc::now(),
+        };
+        let latest_price = price_data.get(0).unwrap_or(&default_price);
+        let previous_price = price_data.get(1).unwrap_or(&default_price);
 
         let price_change_percent =
             ((latest_price.price - previous_price.price) / previous_price.price) * 100.0;

@@ -33,6 +33,7 @@ async fn rocket() -> _ {
 
     let rocket = rocket::custom(db_figment)
         .attach(persist::Db::init())
+        .attach(services::Logins::default())
         .attach(AdHoc::try_on_ignite(
             "DB Migrations",
             persist::run_migrations,

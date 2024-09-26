@@ -41,7 +41,7 @@ pub async fn register_monitor(rocket: &Rocket<Build>) {
     });
 }
 
-#[derive(Clone)]
+#[derive(Default, Clone)]
 pub struct Logins {
     logins: Arc<Mutex<HashMap<IpAddr, DateTime<Utc>>>>,
 }
