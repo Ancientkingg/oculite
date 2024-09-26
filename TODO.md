@@ -1,6 +1,6 @@
+# Todo
+
 - Notification generation
 - Email or mobile notification generation
 - PWA
-- Back-end pipeline
 - Improve error handling server-side
-- Static site generation
