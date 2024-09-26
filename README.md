@@ -42,7 +42,7 @@ npm run deploy # builds the front-end and puts the files in the back-end's `publ
 
 ### Monitor
 
-To run the monitors, navigate to the `monitors` directory and run the following command:
+To run one of the example monitors, navigate to the monitor's directory and run the following command:
 
 ```bash
 npm run start
@@ -83,7 +83,7 @@ The monitor services are responsible for extracting the data from the sources (e
 
 Since retrieving data from the sources can be very specific to the source, the monitor services were introduced to abstract the data fetching process and provide a standardized format to the data. They communicate with the back-end by exposing a REST API.
 
-## How to add a monitor
+## How to setup a new monitor
 
 A monitor needs to expose a single REST API endpoint at `/` that returns data in the following JSON format:
 
