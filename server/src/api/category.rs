@@ -1,4 +1,7 @@
-use crate::persist::{self, category::Category, itemtracker::ItemTrackerId, Db};
+use crate::{
+    persist::{self, category::Category, itemtracker::ItemTrackerId, Db},
+    services::notification,
+};
 use rocket::{
     http::Status,
     serde::{json::Json, Deserialize, Serialize},
@@ -70,7 +73,7 @@ pub async fn all(db: &Db) -> (Status, Json<CategoryResponse>) {
 }
 
 #[post("/", data = "<category>")]
-pub async fn add(db: Connection<Db>, category: Json<CategoryRequest>) -> (Status, &'static str) {
+pub async fn add(db: &Db, category: Json<CategoryRequest>) -> (Status, &'static str) {
     if category.0.name.is_none() || category.0.url.is_none() {
         return (Status::BadRequest, "Category name and url are required");
     }
@@ -78,6 +81,7 @@ pub async fn add(db: Connection<Db>, category: Json<CategoryRequest>) -> (Status
     match persist::category::insert(db, category.clone().into_inner().into()).await {
         Ok(category) => {
             info!("Category {} added @ {}", category, category.url);
+            let _ = notification::insert_category_added(db, &category.category_name).await;
             (Status::Created, "Category added")
         }
         Err(x) => {

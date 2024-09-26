@@ -5,10 +5,13 @@ use rocket::futures::future::join_all;
 use serde_json::json;
 use sqlx::PgPool;
 
-use crate::persist::{
-    self,
-    category::Category,
-    itemtracker::{ItemTracker, PriceData},
+use crate::{
+    persist::{
+        self,
+        category::Category,
+        itemtracker::{ItemTracker, PriceData},
+    },
+    services::notification,
 };
 
 pub async fn filter_inactive_categories(it: Vec<(i32, Category)>) -> Vec<i32> {
@@ -73,17 +76,19 @@ pub async fn refresh_all(db: &PgPool) -> Result<(), RefreshError> {
         let it = match result {
             Ok(it) => it,
             Err(e) => {
+                let category = categories.get(idx).expect("Unable to get corresponding category to item tracker result. Categories don't match!");
+                notification::insert_category_not_responding(db, &category.category_name).await?;
                 error!(
                     "SKIPPING CATEGORY | Failed to fetch category {}: {}",
-                    categories.get(idx).expect("Unable to get corresponding category to item tracker result. Categories don't match!"),
-                    e
+                    category, e
                 );
                 continue;
             }
         };
 
         let category_id = categories.get(idx).expect("Unable to get corresponding category to item tracker result. Categories don't match!").category_id;
-        let current_category_it_ids = persist::itemtracker::get_ids_by_category(db, category_id).await?;
+        let current_category_it_ids =
+            persist::itemtracker::get_ids_by_category(db, category_id).await?;
 
         current_ids.extend(current_category_it_ids.clone());
 
@@ -153,7 +158,13 @@ pub async fn fetch_category(category: Category) -> Result<Vec<ItemTracker>, reqw
                 .send()
                 .await?
         }
-        None => client.post(&category.url).json(&json!({"config": null})).send().await?,
+        None => {
+            client
+                .post(&category.url)
+                .json(&json!({"config": null}))
+                .send()
+                .await?
+        }
     };
 
     let it_resp = resp.json::<ItemTrackerResponse>().await?;
@@ -177,6 +188,32 @@ pub async fn fetch_category(category: Category) -> Result<Vec<ItemTracker>, reqw
         .collect())
 }
 
-pub async fn analyze_all(db: &PgPool) -> Result<(), sqlx::Error> {
-    todo!("Implement notification generation for all item trackers which have changed past a certain threshold")
+pub async fn analyze_all(db: &PgPool, significance_delta: f64) -> Result<(), sqlx::Error> {
+    let its = persist::itemtracker::all(db).await?;
+
+    for it in its {
+        let price_data = it.price_data.expect("No price data for item tracker");
+
+        let latest_price = &price_data[0];
+        let previous_price = &price_data[1];
+
+        let price_change_percent =
+            ((latest_price.price - previous_price.price) / previous_price.price) * 100.0;
+
+        if price_change_percent.abs() >= significance_delta {
+            let currency = it.currency.as_ref().expect("No currency for item tracker");
+            let it_name = &it.name;
+
+            notification::insert_price_change(
+                db,
+                it_name,
+                price_change_percent,
+                latest_price.price,
+                currency,
+            )
+            .await?;
+        }
+    }
+
+    Ok(())
 }

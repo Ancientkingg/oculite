@@ -1,6 +1,6 @@
 use rocket::serde::{Deserialize, Serialize};
 use rocket_db_pools::Connection;
-use sqlx::{Pool, Postgres};
+use sqlx::{PgPool, Pool, Postgres};
 use std::{
     fmt::{self, Display, Formatter},
     hash::{Hash, Hasher},
@@ -63,7 +63,7 @@ pub async fn get_by_id(mut db: Connection<Db>, category_id: i32) -> Result<Categ
     .await
 }
 
-pub async fn insert(mut db: Connection<Db>, category: Category) -> Result<Category, sqlx::Error> {
+pub async fn insert(db: &PgPool, category: Category) -> Result<Category, sqlx::Error> {
     sqlx::query_as!(
         Category,
         "INSERT INTO categories (category_id, category_name, config, url) VALUES ($1, $2, $3, $4) RETURNING *",
@@ -72,7 +72,7 @@ pub async fn insert(mut db: Connection<Db>, category: Category) -> Result<Catego
         category.config,
         category.url,
     )
-    .fetch_one(&mut **db)
+    .fetch_one(db)
     .await
 }
 
