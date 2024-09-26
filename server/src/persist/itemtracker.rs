@@ -42,7 +42,6 @@ impl Display for ItemTracker {
                     url: String::from("None"),
                     config: None
                 })
-                .to_string()
         )
     }
 }
@@ -60,7 +59,9 @@ impl ItemTracker {
 }
 
 pub async fn all_ids(db: &PgPool) -> Result<Vec<(ItemTrackerId, Category)>, sqlx::Error> {
-    let item_tracker_ids = sqlx::query!(
+    
+
+    sqlx::query!(
         "SELECT id, category_id, url, category_name, config FROM item_trackers JOIN categories USING (category_id)"
     )
     .map(|row| {
@@ -74,9 +75,7 @@ pub async fn all_ids(db: &PgPool) -> Result<Vec<(ItemTrackerId, Category)>, sqlx
         (row.id, category)
     })
     .fetch_all(db)
-    .await;
-
-    return item_tracker_ids;
+    .await
 }
 
 fn convert_to_item_tracker(row: PgRow) -> ItemTracker {
@@ -92,7 +91,7 @@ fn convert_to_item_tracker(row: PgRow) -> ItemTracker {
             let arr = data
                 .as_array()
                 .expect("Price data column cannot be parsed as a JSON array");
-            arr.into_iter()
+            arr.iter()
                 .map(|x| {
                     let element = x
                         .as_object()
@@ -138,26 +137,26 @@ pub async fn get_by_id(
     mut db: Connection<Db>,
     id: ItemTrackerId,
 ) -> Result<ItemTracker, sqlx::Error> {
-    let item_tracker = sqlx::query(
+    
+
+    sqlx::query(
         "SELECT category_id, category_name, config, url, id, name, currency, icon, link, favorite, json_agg(pd.* ORDER BY pd.date DESC) as price_data FROM item_trackers it JOIN categories c USING (category_id) LEFT JOIN price_data pd ON it.id=pd.item_tracker WHERE id = $1 GROUP BY it.id, c.category_id, c.url, c.category_name, c.config"
     )
     .bind(id)
     .map(convert_to_item_tracker)
     .fetch_one(&mut **db)
-    .await;
-
-    return item_tracker;
+    .await
 }
 
 pub async fn all(db: &PgPool) -> Result<Vec<ItemTracker>, sqlx::Error> {
-    let item_trackers = sqlx::query(
+    
+
+    sqlx::query(
         "SELECT category_id, category_name, config, url, id, name, currency, icon, link, favorite, json_agg(pd.* ORDER BY pd.date DESC) as price_data FROM item_trackers it JOIN categories c USING (category_id) LEFT JOIN price_data pd ON it.id=pd.item_tracker GROUP BY it.id, c.category_id, c.url, c.category_name, c.config"
     )
     .map(convert_to_item_tracker)
     .fetch_all(db)
-    .await;
-
-    return item_trackers;
+    .await
 }
 
 pub async fn insert(db: &PgPool, it: ItemTracker) -> Result<ItemTrackerId, sqlx::Error> {
@@ -193,14 +192,14 @@ pub async fn get_ids_by_category(
     db: &PgPool,
     category_id: i32,
 ) -> Result<Vec<ItemTrackerId>, sqlx::Error> {
-    let item_tracker_ids = sqlx::query_scalar!(
+    
+
+    sqlx::query_scalar!(
         "SELECT id FROM item_trackers JOIN categories USING (category_id) WHERE category_id = $1",
         category_id
     )
     .fetch_all(db)
-    .await;
-
-    return item_tracker_ids;
+    .await
 }
 
 pub async fn set_favorite(
@@ -208,15 +207,15 @@ pub async fn set_favorite(
     id: ItemTrackerId,
     favorite: bool,
 ) -> Result<ItemTrackerId, sqlx::Error> {
-    let item_tracker_id = sqlx::query_scalar!(
+    
+
+    sqlx::query_scalar!(
         "UPDATE item_trackers SET favorite = $2 WHERE id = $1 RETURNING id",
         id,
         favorite
     )
     .fetch_one(&mut **db)
-    .await;
-
-    return item_tracker_id;
+    .await
 }
 
 pub async fn add_price_data(
@@ -225,21 +224,20 @@ pub async fn add_price_data(
     price_data: f64,
     date: DateTime<Utc>,
 ) -> Result<ItemTrackerId, sqlx::Error> {
-    let item_tracker_id = sqlx::query_scalar!(
+    
+
+    sqlx::query_scalar!(
         "INSERT INTO price_data (item_tracker, price, date) SELECT it, p, d FROM (SELECT CAST($1 as integer) as it, CAST($2 as double precision) as p, CAST($3 as timestamp with time zone) as d) t WHERE EXISTS (SELECT id FROM item_trackers WHERE id = it) RETURNING item_tracker",
         id,
         price_data,
         date
-    ).fetch_one(db).await;
-
-    return item_tracker_id;
+    ).fetch_one(db).await
 }
 
 pub async fn delete(db: &PgPool, id: ItemTrackerId) -> Result<ItemTrackerId, sqlx::Error> {
-    let item_tracker_id =
-        sqlx::query_scalar!("DELETE FROM item_trackers WHERE id = $1 RETURNING id", id)
-            .fetch_one(db)
-            .await;
+    
 
-    return item_tracker_id;
+    sqlx::query_scalar!("DELETE FROM item_trackers WHERE id = $1 RETURNING id", id)
+            .fetch_one(db)
+            .await
 }

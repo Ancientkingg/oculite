@@ -15,7 +15,7 @@ pub struct Notification {
 
 pub async fn get_all(db: &Db) -> Result<Vec<Notification>, sqlx::Error> {
     let rows = sqlx::query_as!(Notification, "SELECT * FROM notifications")
-        .fetch_all(&(*db).0)
+        .fetch_all(&db.0)
         .await?;
 
     Ok(rows)

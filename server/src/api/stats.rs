@@ -70,7 +70,7 @@ pub enum FavoriteResponse {
 
 #[get("/favorite")]
 pub async fn get_favorite(db: &Db) -> (Status, Json<FavoriteResponse>) {
-    match persist::stats::get_ids_of_favorite_trackers(&db).await {
+    match persist::stats::get_ids_of_favorite_trackers(db).await {
         Ok(ids) => (Status::Ok, Json(FavoriteResponse::Data(ids))),
         Err(_) => (Status::InternalServerError, Json(FavoriteResponse::Error("Failed to get favorite trackers"))),
     }

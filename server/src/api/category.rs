@@ -147,7 +147,7 @@ pub async fn update(
         Err(x) => match x {
             sqlx::error::Error::RowNotFound => {
                 error!("Category {} not found: {}", category_id, x);
-                return (Status::NotFound, "Category not found");
+                (Status::NotFound, "Category not found")
             }
             _ => {
                 error!(

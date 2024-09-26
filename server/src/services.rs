@@ -68,9 +68,9 @@ impl Fairing for Logins {
 
         let ip = request.client_ip().unwrap();
 
-        if !logins.contains_key(&ip) {
+        if let std::collections::hash_map::Entry::Vacant(e) = logins.entry(ip) {
             notification::insert_login(db, &ip.to_string()).await.expect("Failed to generate login notification");
-            logins.insert(ip, Utc::now());
+            e.insert(Utc::now());
         }
     }
 }

@@ -2,7 +2,7 @@ use super::Db;
 
 pub async fn get_total_trackers(db: &Db) -> Result<i64, sqlx::Error> {
     let row = sqlx::query_scalar!("SELECT COUNT(*) FROM item_trackers")
-        .fetch_one(&(*db).0) // Mutable dereference
+        .fetch_one(&db.0) // Mutable dereference
         .await?;
 
     match row {
@@ -29,7 +29,7 @@ pub async fn get_rising_trackers(db: &Db) -> Result<i64, sqlx::Error> {
         WHERE
             latest_price > second_latest_price"
     )
-    .fetch_one(&(*db).0)
+    .fetch_one(&db.0)
     .await?;
 
     match row {
@@ -56,7 +56,7 @@ pub async fn get_falling_trackers(db: &Db) -> Result<i64, sqlx::Error> {
         WHERE
             latest_price < second_latest_price"
     )
-    .fetch_one(&(*db).0)
+    .fetch_one(&db.0)
     .await?;
 
     match row {
@@ -83,7 +83,7 @@ pub async fn get_stale_trackers(db: &Db) -> Result<i64, sqlx::Error> {
         WHERE
             ABS(latest_price - second_latest_price) <= (latest_price * 0.02);"
     )
-    .fetch_one(&(*db).0)
+    .fetch_one(&db.0)
     .await?;
 
     match row {
@@ -94,7 +94,7 @@ pub async fn get_stale_trackers(db: &Db) -> Result<i64, sqlx::Error> {
 
 pub async fn get_ids_of_favorite_trackers(db: &Db) -> Result<Vec<i32>, sqlx::Error> {
     let rows = sqlx::query_scalar!("SELECT id FROM item_trackers WHERE favorite = true")
-        .fetch_all(&(*db).0)
+        .fetch_all(&db.0)
         .await?;
 
     Ok(rows)
