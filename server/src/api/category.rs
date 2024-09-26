@@ -85,18 +85,15 @@ pub async fn add(db: &Db, category: Json<CategoryRequest>) -> (Status, &'static 
             (Status::Created, "Category added")
         }
         Err(x) => {
-            match &x {
-                sqlx::Error::Database(db_err) => {
-                    if db_err.is_unique_violation() {
-                        error!(
-                            "Category {} already exists: {}",
-                            Into::<Category>::into(category.0),
-                            x
-                        );
-                        return (Status::Conflict, "Category already exists");
-                    }
+            if let sqlx::Error::Database(db_err) = &x {
+                if db_err.is_unique_violation() {
+                    error!(
+                        "Category {} already exists: {}",
+                        Into::<Category>::into(category.0),
+                        x
+                    );
+                    return (Status::Conflict, "Category already exists");
                 }
-                _ => {}
             }
             error!(
                 "Failed to add category {}: {}",
