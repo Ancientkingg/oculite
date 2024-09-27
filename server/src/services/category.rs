@@ -192,6 +192,10 @@ pub async fn analyze_all(db: &PgPool, significance_delta: f64) -> Result<(), sql
     let its = persist::itemtracker::all(db).await?;
 
     for it in its {
+        if !it.favorite.unwrap_or(false) {
+            continue;
+        }
+
         let price_data = it.price_data.expect("No price data for item tracker");
 
         let default_price = PriceData {
