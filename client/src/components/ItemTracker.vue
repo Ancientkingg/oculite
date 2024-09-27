@@ -17,7 +17,7 @@ if (model.value === undefined) {
     throw new Error('ItemTracker is required');
 }
 
-const latestPrice = computed(() => model.value!.getLatestPrice())
+const latestPrice = computed(() => model.value!.getLatestPrice().toFixed(2))
 
 const priceChange = computed(() => model.value!.getPriceChangeAsString())
 
@@ -26,7 +26,7 @@ const chartData = reactive({
     datasets: [
         {
             label: `Price ${model.value.getCurrency()}`,
-            data: model.value.getPriceData().prices,
+            data: model.value.getPriceData().prices.map(x => x.toFixed(2)),
             fill: true,
             tension: 0.4,
             backgroundColor: (context, _scales) => {
@@ -124,7 +124,8 @@ const favorite = () => {
                 <div class="card-divider" />
                 <img
                     :src="model!.getIcon()"
-                    height="100"
+                    width="100"
+                    style="border-radius: 8px;"
                     >
                 <div class="card-price-details">
                     <h4 :class="`${priceChange[0] !== '-' ? 'text-green-500' : 'text-red-500'} text-center h-full mt-auto`">

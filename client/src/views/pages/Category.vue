@@ -35,9 +35,8 @@ watch(fetchedItemTrackers, () => {
 
 <template>
     <div class="grid p-fluid">
-        <div
+        <template
             v-if="isLoading"
-            class="w-full h-full m-0 p-0 grid"
             >
             <div
                 v-for="n in 12"
@@ -51,12 +50,11 @@ watch(fetchedItemTrackers, () => {
                     borderRadius="12px"
                     />
             </div>
-        </div>
+        </template>
 
-        <div
+        <template
             v-for="(itemTracker, i) in itemTrackerResponses.data"
             :key="i"
-            class="w-full h-full m-0 p-0 grid"
             >
             <ItemTracker
                 v-if="!itemTracker.isError && !itemTracker.isPending"
@@ -72,6 +70,6 @@ watch(fetchedItemTrackers, () => {
                     borderRadius="12px"
                     />
             </div>
-        </div>
+        </template>
     </div>
 </template>
