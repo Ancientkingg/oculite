@@ -18,7 +18,7 @@ pub async fn insert_login(db: &PgPool, ip: &str) -> Result<(), sqlx::Error> {
 
 pub async fn insert_price_change(db: &PgPool, it_name: &str, price_change_percent: f64, new_price: f64, currency: &str) -> Result<(), sqlx::Error> {
     let message = std::format!(
-        "{} has significantly changed price ({}%). Now {} {} [{}]",
+        "{} has significantly changed price ({:.0}%). Now {} {:.2} [{}]",
         it_name,
         price_change_percent,
         currency,
