@@ -161,6 +161,7 @@ const favorite = () => {
                 </a>
                 <Button
                     class="w-2 h-3rem bg-pink-100 border-0 hover:bg-pink-200"
+                    :disabled="true"
                     :icon="`pi ${model!.isFavorite() ? 'pi-heart-fill' : 'pi-heart'} text-xl text-pink-500`"
                     aria-label="Favorite"
                     @click="favorite"

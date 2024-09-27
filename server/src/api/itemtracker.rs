@@ -5,7 +5,11 @@ use rocket::{
 use rocket_db_pools::Connection;
 
 use crate::{
-    persist::{self, itemtracker::{ItemTracker, ItemTrackerId}, Db},
+    persist::{
+        self,
+        itemtracker::{ItemTracker, ItemTrackerId},
+        Db,
+    },
     services::category::filter_inactive_categories,
 };
 
@@ -68,6 +72,15 @@ pub async fn get(db: Connection<Db>, id: i32) -> (Status, Json<SingleItemTracker
 
 #[put("/<id>/favorite")]
 pub async fn favorite(db: Connection<Db>, id: i32) -> (Status, Json<ItemTrackerIdResponse>) {
+    if std::env::var("READ_ONLY").unwrap_or("".to_string()) == "true" {
+        return (
+            Status::Forbidden,
+            Json(ItemTrackerIdResponse::Error(
+                "[READ-ONLY] Cannot favorite category",
+            )),
+        );
+    }
+
     match persist::itemtracker::set_favorite(db, id, true).await {
         Ok(it) => {
             info!("Item tracker favorited: {:?}", it);
@@ -87,6 +100,15 @@ pub async fn favorite(db: Connection<Db>, id: i32) -> (Status, Json<ItemTrackerI
 
 #[put("/<id>/unfavorite")]
 pub async fn unfavorite(db: Connection<Db>, id: i32) -> (Status, Json<ItemTrackerIdResponse>) {
+    if std::env::var("READ_ONLY").unwrap_or("".to_string()) == "true" {
+        return (
+            Status::Forbidden,
+            Json(ItemTrackerIdResponse::Error(
+                "[READ-ONLY] Cannot unfavorite category",
+            )),
+        );
+    }
+
     match persist::itemtracker::set_favorite(db, id, false).await {
         Ok(it) => {
             info!("Item tracker unfavorited: {:?}", it);

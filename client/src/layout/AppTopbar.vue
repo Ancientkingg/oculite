@@ -174,6 +174,7 @@ const isOutsideClicked = (event) => {
             <button
                 v-if="props.showCategoryConfig"
                 class="p-link layout-topbar-button"
+                :disabled="true"
                 @click="openCategoryConfig"
                 >
                 <i class="pi pi-file-edit" />
@@ -181,6 +182,7 @@ const isOutsideClicked = (event) => {
             </button>
             <button
                 class="p-link layout-topbar-button"
+                :disabled="true"
                 @click="openAddCategory"
                 >
                 <i class="pi pi-plus" />

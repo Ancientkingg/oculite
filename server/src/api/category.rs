@@ -73,6 +73,10 @@ pub async fn all(db: &Db) -> (Status, Json<CategoryResponse>) {
 
 #[post("/", data = "<category>")]
 pub async fn add(db: &Db, category: Json<CategoryRequest>) -> (Status, &'static str) {
+    if std::env::var("READ_ONLY").unwrap_or("".to_string()) == "true" {
+        return (Status::Forbidden, "[READ-ONLY] Cannot add category");
+    }
+
     if category.0.name.is_none() || category.0.url.is_none() {
         return (Status::BadRequest, "Category name and url are required");
     }
@@ -143,6 +147,10 @@ pub async fn update(
     category_id: i32,
     category: Json<CategoryRequest>,
 ) -> (Status, &'static str) {
+    if std::env::var("READ_ONLY").unwrap_or("".to_string()) == "true" {
+        return (Status::Forbidden, "[READ-ONLY] Cannot add category");
+    }
+    
     let c = category.clone().into_inner();
     match persist::category::update(db, category_id, c.name, c.config, c.url).await {
         Ok(category) => {
