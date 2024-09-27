@@ -1,4 +1,5 @@
 [build]
+  publish = "netlify/functions"
   functions = "netlify/functions"
 [functions]
   external_node_modules = ["express"]
