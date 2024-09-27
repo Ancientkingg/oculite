@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS public.item_trackers (
     link character varying,
     favorite boolean,
     category_id integer NOT NULL,
-    FOREIGN KEY (category_id) REFERENCES public.categories(category_id),
+    FOREIGN KEY (category_id) REFERENCES public.categories(category_id) ON DELETE CASCADE,
     PRIMARY KEY (id)
 );
 
