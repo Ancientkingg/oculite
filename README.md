@@ -1,6 +1,6 @@
 # Oculite
 
-A user-friendly dashboard for monitoring prices and values. A (read-only) demo can be found [here](https://oculite.shuttleapp.rs)
+A user-friendly dashboard for monitoring prices and values. A (read-only) demo using FAKE data can be found [here](https://oculite.shuttleapp.rs)
 
 > A personal write up on reverse-engineering the AutoDoc API can be found [here](/monitors/autodoc/README.md).
 
