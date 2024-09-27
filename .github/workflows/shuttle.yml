@@ -28,6 +28,7 @@ jobs:
 
       - uses: shuttle-hq/deploy-action@main
         with:
+          name: oculite
           deploy-key: ${{ secrets.SHUTTLE_API_KEY }}
           working-directory: "server"
           allow-dirty: "true"
