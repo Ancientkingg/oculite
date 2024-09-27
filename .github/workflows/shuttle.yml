@@ -5,7 +5,7 @@ on:
     branches: [ 'shuttle' ]
 
 env:
-  VITE_API_URL: https://oculite.shuttleapp.rs/api
+  VITE_API_URL: https://oculite.shuttleapp.rs/api/
 
 jobs:
   deploy:
