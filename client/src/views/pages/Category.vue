@@ -34,7 +34,10 @@ watch(fetchedItemTrackers, () => {
 </script>
 
 <template>
-    <div class="grid p-fluid">
+    <div
+        class="grid p-fluid"
+        style="margin-bottom: -1rem;"
+        >
         <template
             v-if="isLoading"
             >
