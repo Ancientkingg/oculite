@@ -1,12 +1,12 @@
 # Oculite
 
-A user-friendly dashboard for monitoring prices and values.
+A user-friendly dashboard for monitoring prices and values. A (read-only) demo can be found [here](https://oculite.shuttleapp.rs)
 
 > A personal write up on reverse-engineering the AutoDoc API can be found [here](/monitors/autodoc/README.md).
 
-<img alt="Oculite dashboard" src="/@meta/images/dashboard.png">
-<img alt="Oculite monitor" src="/@meta/images/category.png">
-<img alt="Oculite dashboard on mobile" src="/@meta/images/dashboard_mobile.png" height="768">
+<img alt="Oculite dashboard" src="/@meta/images/dashboard.png" height="768">
+<img alt="Oculite monitor" src="/@meta/images/category.png" height="768">
+<img alt="Oculite dashboard on mobile" src="/@meta/images/dashboard_mobile.png" height="640">
 
 ## Tech stack
 
