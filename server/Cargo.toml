@@ -22,3 +22,6 @@ thiserror = "1.0.63"
 chrono-tz = "0.10.0"
 serde_json = "1.0.128"
 dotenv = "0.15.0"
+shuttle-runtime = "0.47.0"
+shuttle-shared-db = { version = "0.47.0", features = ["postgres"] }
+shuttle-rocket = "0.47.0"

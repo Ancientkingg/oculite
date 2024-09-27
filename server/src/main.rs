@@ -1,6 +1,3 @@
-use dotenv::dotenv;
-use std::env;
-
 use rocket::{fairing::AdHoc, fs::FileServer, http::Method};
 use rocket_cors::{AllowedOrigins, CorsOptions};
 use rocket_db_pools::Database;
@@ -12,10 +9,8 @@ mod api;
 mod persist;
 mod services;
 
-#[launch]
-async fn rocket() -> _ {
-    dotenv().ok();
-
+#[shuttle_runtime::main]
+async fn main(#[shuttle_shared_db::Postgres] conn_str: String) -> shuttle_rocket::ShuttleRocket {
     let cors = CorsOptions::default()
         .allowed_origins(AllowedOrigins::all())
         .allowed_methods(
@@ -26,10 +21,7 @@ async fn rocket() -> _ {
         )
         .allow_credentials(true);
 
-    let db_figment = rocket::Config::figment().merge((
-        "databases.db.url",
-        env::var("DATABASE_URL").expect("DATABASE_URL must be set"),
-    ));
+    let db_figment = rocket::Config::figment().merge(("databases.db.url", conn_str));
 
     let rocket = rocket::custom(db_figment)
         .attach(persist::Db::init())
@@ -47,5 +39,5 @@ async fn rocket() -> _ {
 
     services::register_monitor(&rocket).await;
 
-    rocket
+    Ok(rocket.into())
 }
