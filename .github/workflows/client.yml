@@ -2,9 +2,9 @@ name: Frontend CI/CD
 
 on:
     push:
-        branches: ['master', 'shuttle']
+        branches: ['master', 'demo']
     pull_request:
-        branches: ['master', 'shuttle']
+        branches: ['master', 'demo']
 
     workflow_dispatch:
 
