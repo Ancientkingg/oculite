@@ -33,7 +33,7 @@ export async function fetchAllCategories(queryClient: QueryClient) {
 }
 
 async function fetchCategories(): Promise<Category[]> {
-    return fetch(new URL('/category', import.meta.env.VITE_API_BASE_URL), {
+    return fetch(new URL('./category', import.meta.env.VITE_API_BASE_URL), {
         method: 'GET',
     })
         .then((res) => res.json())
@@ -50,7 +50,7 @@ export async function addCategory(
     categoryUrl: string,
 ): Promise<number> {
     const response = await fetch(
-        new URL('/category', import.meta.env.VITE_API_BASE_URL),
+        new URL('./category', import.meta.env.VITE_API_BASE_URL),
         {
             method: 'POST',
             body: JSON.stringify({ name: categoryName, url: categoryUrl }),
@@ -61,7 +61,7 @@ export async function addCategory(
 
 export async function getCategoryConfig(categoryId: number): Promise<string> {
     return await fetch(
-        new URL(`/category/${categoryId}`, import.meta.env.VITE_API_BASE_URL),
+        new URL(`./category/${categoryId}`, import.meta.env.VITE_API_BASE_URL),
         {
             method: 'GET',
         },
@@ -75,7 +75,7 @@ export async function updateCategoryConfig(
     config: string,
 ): Promise<number> {
     const response = await fetch(
-        new URL(`/category/${categoryId}`, import.meta.env.VITE_API_BASE_URL),
+        new URL(`./category/${categoryId}`, import.meta.env.VITE_API_BASE_URL),
         {
             method: 'PUT',
             body: JSON.stringify({ config: config }),
