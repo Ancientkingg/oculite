@@ -31,7 +31,7 @@ export function getItemTrackerTest(id: number) {
 }
 
 async function fetchItemTracker(id: number): Promise<ItemTracker> {
-    return fetch(import.meta.env.VITE_API_BASE_URL + `it/${id}`, {
+    return fetch(new URL(`/it/${id}`, import.meta.env.VITE_API_BASE_URL), {
         method: 'GET',
     })
         .then((res) => res.json())
@@ -53,7 +53,7 @@ async function fetchItemTracker(id: number): Promise<ItemTracker> {
 
 async function fetchAllItemTrackerIds(categoryId: number): Promise<number[]> {
     return fetch(
-        import.meta.env.VITE_API_BASE_URL + `category/${categoryId}/it`,
+        new URL(`/category/${categoryId}/it`, import.meta.env.VITE_API_BASE_URL),
         {
             method: 'GET',
         },
@@ -67,9 +67,10 @@ export function favorite(item: ItemTracker) {
     const favoriteMutation = useMutation({
         mutationFn: (itemTrackerId: number) =>
             fetch(
-                import.meta.env.VITE_API_BASE_URL +
-                    `it/${itemTrackerId}/` +
-                    'favorite',
+                new URL(
+                    `/it/${itemTrackerId}/favorite`,
+                    import.meta.env.VITE_API_BASE_URL,
+                ),
                 {
                     method: 'PUT',
                 },
@@ -90,9 +91,10 @@ export function unfavorite(item: ItemTracker) {
     const unFavoriteMutation = useMutation({
         mutationFn: (itemTrackerId: number) =>
             fetch(
-                import.meta.env.VITE_API_BASE_URL +
-                    `it/${itemTrackerId}/` +
-                    'unfavorite',
+                new URL(
+                    `/it/${itemTrackerId}/unfavorite`,
+                    import.meta.env.VITE_API_BASE_URL,
+                ),
                 {
                     method: 'PUT',
                 },

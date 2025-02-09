@@ -4,7 +4,7 @@ import Notification from '@/model/Notification';
 import TrackerStats from '@/model/TrackerStats';
 
 export async function fetchHealth() {
-    return fetch(import.meta.env.VITE_API_BASE_URL + 'health', {
+    return fetch(new URL('/health', import.meta.env.VITE_API_BASE_URL), {
         method: 'GET',
     });
 }
@@ -15,7 +15,7 @@ export async function serverIsOk(): Promise<boolean> {
 
 export function getTrackerStats() {
     const { isPending, isError, data, error } = useQuery({
-        queryKey: ['total-trackers'],
+        queryKey: ['/total-trackers'],
         queryFn: () => fetchTrackerStats(),
     });
 
@@ -23,7 +23,7 @@ export function getTrackerStats() {
 }
 
 async function fetchTrackerStats(): Promise<TrackerStats> {
-    return fetch(import.meta.env.VITE_API_BASE_URL + 'stats', {
+    return fetch(new URL('/stats', import.meta.env.VITE_API_BASE_URL), {
         method: 'GET',
     })
         .then((res) => res.json())
@@ -47,9 +47,12 @@ export function getNotifications() {
 }
 
 async function fetchNotifications(): Promise<Notification[]> {
-    return fetch(import.meta.env.VITE_API_BASE_URL + 'stats/notifications', {
-        method: 'GET',
-    })
+    return fetch(
+        new URL('/stats/notifications', import.meta.env.VITE_API_BASE_URL),
+        {
+            method: 'GET',
+        },
+    )
         .then((res) => res.json())
         .then((data) => {
             return data.Data.map((notification: any) => {
@@ -73,9 +76,12 @@ export function getFavoriteTrackers() {
 }
 
 async function fetchFavoriteTrackers(): Promise<number[]> {
-    return fetch(import.meta.env.VITE_API_BASE_URL + 'stats/favorite', {
-        method: 'GET',
-    })
+    return fetch(
+        new URL('/stats/favorite', import.meta.env.VITE_API_BASE_URL),
+        {
+            method: 'GET',
+        },
+    )
         .then((res) => res.json())
         .then((data) => data.Data);
 }
