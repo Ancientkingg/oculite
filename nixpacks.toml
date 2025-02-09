@@ -1,7 +1,7 @@
 providers = ['rust', 'node','...']
 
 [phases.setup]
-nixPkgs = ['openssl','pkg-config','...']
+nixLibs = ['openssl', '...']
 nixOverlays = [
     'https://github.com/dreadsfun/rust-overlay/archive/master.tar.gz',
 ]
