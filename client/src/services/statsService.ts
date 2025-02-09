@@ -4,7 +4,7 @@ import Notification from '@/model/Notification';
 import TrackerStats from '@/model/TrackerStats';
 
 export async function fetchHealth() {
-    return fetch(new URL('/health', import.meta.env.VITE_API_BASE_URL), {
+    return fetch(new URL('./health', import.meta.env.VITE_API_BASE_URL), {
         method: 'GET',
     });
 }
@@ -23,7 +23,7 @@ export function getTrackerStats() {
 }
 
 async function fetchTrackerStats(): Promise<TrackerStats> {
-    return fetch(new URL('/stats', import.meta.env.VITE_API_BASE_URL), {
+    return fetch(new URL('./stats', import.meta.env.VITE_API_BASE_URL), {
         method: 'GET',
     })
         .then((res) => res.json())
@@ -48,7 +48,7 @@ export function getNotifications() {
 
 async function fetchNotifications(): Promise<Notification[]> {
     return fetch(
-        new URL('/stats/notifications', import.meta.env.VITE_API_BASE_URL),
+        new URL('./stats/notifications', import.meta.env.VITE_API_BASE_URL),
         {
             method: 'GET',
         },
@@ -77,7 +77,7 @@ export function getFavoriteTrackers() {
 
 async function fetchFavoriteTrackers(): Promise<number[]> {
     return fetch(
-        new URL('/stats/favorite', import.meta.env.VITE_API_BASE_URL),
+        new URL('./stats/favorite', import.meta.env.VITE_API_BASE_URL),
         {
             method: 'GET',
         },
